@@ -1,4 +1,7 @@
 from nba_api.stats.static import players
+from datetime import datetime,timedelta
+from basketball_reference_web_scraper import client
+
 import csv
 class Player:
     def __init__(self,name,NBAplayerID,position,avgPoints,salary):
@@ -9,10 +12,23 @@ class Player:
         self.salary = salary
         self.projection = 0
     def __repr__(self):
-        return (self.name + ', ' + self.position + ', ' + self.avgPoints + ', ' + self.salary)
+        return 'Player({},{},{},{},{})'.format(self.name,self.NBAplayerID,self.position,self.avgPoints,self.salary,self.projection)
+       # return (self.name + ', ' + self.position + ', ' + self.avgPoints + ', ' + self.salary)
     def __str__(self):
-        return (self.name + ', ' + self.position + ', ' + self.avgPoints + ', ' + self.salary)
+        return '{},{},{},{},{}'.format(self.name,self.NBAplayerID,self.position,self.avgPoints,self.salary,self.projection)
+
+        #return (self.name + ', ' + self.position + ', ' + self.avgPoints + ', ' + self.salary)
     
+
+## IN: NBAPlayerID
+## Return: True if today's game will be a back-to-back, false otherwise
+def BackToBack(playerName):
+    yesterdayGames = client.player_box_scores(day=20, month=11, year=2018) #TODO calculate yesterday date with datetime
+    for boxscore in yesterdayGames:
+        if boxscore['name'] == playerName:
+            return True
+    return False
+
 def GetListOfPlayers(csvFileName):
     listOfPlayers = []
     lineCount=0
@@ -32,9 +48,10 @@ def GetNBAId(playerFullName):
     playerObj=players.find_players_by_full_name(playerFullName)
     return playerObj[0]["id"]
 def main():
-    eligiblePlayers = GetListOfPlayers("./DKSalaries.csv")
-    for player in eligiblePlayers:
-        print player
+    print BackToBack("John Wall")
+   # eligiblePlayers = GetListOfPlayers("./DKSalaries.csv")
+   # for player in eligiblePlayers:
+   #     print player
     #print GetNBAId("Kevin Love")
 if __name__=="__main__":
     main()
