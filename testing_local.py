@@ -27,7 +27,11 @@ def getLastTwoWeeksAveragePoints(playerName):
             totalFantasyPoints+=singleGameScore
        # print currentBoxScore
         dateIndex+=1
-    averagePoints=(totalFantasyPoints/totalGamesPlayed)
+    if totalGamesPlayed==0:
+        print "{} played 0 games!".format(playerName)
+        averagePoints=0
+    else:
+        averagePoints=(totalFantasyPoints/totalGamesPlayed)
     print "{} played {} games and averaged {} points in last two weeks".format(playerName,totalGamesPlayed,averagePoints)
     return averagePoints
 def main():
