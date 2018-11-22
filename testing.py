@@ -93,6 +93,9 @@ def GetNBAId(playerFullName):
     playerObj=players.find_players_by_full_name(playerFullName)
     return playerObj[0]["id"]
 
+def BreakOutGame():
+    
+
 def main():
     # print BackToBack("John Wall")
     player = getBoxScoreForPlayer("Tobias Harris")
