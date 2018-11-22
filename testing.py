@@ -29,6 +29,50 @@ def BackToBack(playerName):
             return True
     return False
 
+def getBoxScoreForPlayer(playerName):
+    yesterdayGames = client.player_box_scores(day=20, month=11, year=2018) #TODO calculate yesterday date with datetime
+    for boxscore in yesterdayGames:
+        if boxscore['name'] in playerName:
+            return boxscore
+    return None
+
+def FantasyScoreFromSingleGame(boxscore):
+    #TODO calculate fantasy points for single game
+    # print boxscore
+    freeThrowsMade = (boxscore['made_free_throws'])
+    twoPointsMade = (boxscore['made_field_goals'] - boxscore['made_three_point_field_goals'])
+    threePointsMade = (boxscore['made_three_point_field_goals'])
+    totalPoints = (freeThrowsMade * 1) + (twoPointsMade * 2) + (threePointsMade * 3)
+    rebounds = (boxscore['defensive_rebounds'] + boxscore['offensive_rebounds'])
+    assists = (boxscore['assists'])
+    steals = (boxscore['steals'])
+    blocks = (boxscore['blocks'])
+    turnovers = (boxscore['turnovers'])
+    totalFantasyScore = (twoPointsMade * 2) + (threePointsMade * 3.5) + (rebounds * 1.25) \
+                        + (assists * 1.5) + (steals * 2) + (blocks * 2) + (turnovers * -0.5) \
+                        + (freeThrowsMade * 1)
+  
+
+    #calculate if the player scored double double
+    twoDigitStats = 0
+
+    if totalPoints >= 10:
+        twoDigitStats += 1
+    if rebounds >= 10:
+        twoDigitStats += 1
+    if assists >= 10:
+        twoDigitStats += 1 
+    if steals >= 10:
+        twoDigitStats += 1
+    if blocks >= 10:
+        twoDigitStats += 1
+    if twoDigitStats >= 2:
+        totalFantasyScore += 1.5
+    if twoDigitStats >= 3:
+        totalFantasyScore += 3
+
+    return totalFantasyScore
+
 def GetListOfPlayers(csvFileName):
     listOfPlayers = []
     lineCount=0
@@ -44,11 +88,16 @@ def GetListOfPlayers(csvFileName):
                 tempPlayerObj = Player(row[2], row[3], row[4], row[8], row[5])
                 listOfPlayers.append(tempPlayerObj)
     return listOfPlayers
+
 def GetNBAId(playerFullName):
     playerObj=players.find_players_by_full_name(playerFullName)
     return playerObj[0]["id"]
+
 def main():
-    print BackToBack("John Wall")
+    # print BackToBack("John Wall")
+    player = getBoxScoreForPlayer("Tobias Harris")
+    fantasyPoints = FantasyScoreFromSingleGame(player)
+    print fantasyPoints
    # eligiblePlayers = GetListOfPlayers("./DKSalaries.csv")
    # for player in eligiblePlayers:
    #     print player
