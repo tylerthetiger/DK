@@ -3,6 +3,7 @@ from datetime import datetime,timedelta
 from basketball_reference_web_scraper import client
 from player import Player
 import csv
+from testing_local import *
 
 ## IN: NBAPlayerID
 ## Return: True if today's game will be a back-to-back, false otherwise
@@ -173,7 +174,10 @@ def main():
     # injuredPlayers = GetInjuries('injuries.csv')
     # print(injuredPlayers)
     eligibleList = GetEligiblePlayers('DKSalaries.csv', 'injuries.csv')
-    print(eligibleList)
+    for player in eligibleList:
+        getLastTwoWeeksAveragePoints(player)
+
+    #print(eligibleList)
     # player = getBoxScoreForPlayer("Tobias Harris")
     # fantasyPoints = FantasyScoreFromSingleGame(player)
     # print fantasyPoints

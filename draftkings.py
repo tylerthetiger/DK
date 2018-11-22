@@ -1,6 +1,6 @@
 from pydfs_lineup_optimizer import get_optimizer, Site, Sport
 optimizer = get_optimizer(Site.DRAFTKINGS,Sport.BASKETBALL)
-optimizer.load_players_from_csv('./DKSalaries.csv')
+optimizer.load_players_from_csv('./DKSalaries-projections.csv')
 lineups = optimizer.optimize(n=1)
 for lineup in lineups:
     print lineup
