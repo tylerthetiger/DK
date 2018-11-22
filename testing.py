@@ -91,7 +91,7 @@ def GetListOfPlayers(csvFileName):
     lineCount=0
     with open(csvFileName) as csv_file:
        csv_reader = csv.reader(csv_file, delimiter=',')
-        for row in csv_reader:
+       for row in csv_reader:
             if lineCount == 0:
                 lineCount+=1 #skip the header
             else:
@@ -99,6 +99,44 @@ def GetListOfPlayers(csvFileName):
                 tempPlayerObj=Player(row)
                 listOfPlayers.append(tempPlayerObj)
     return listOfPlayers
+
+# get list of injured players from https://www.basketball-reference.com/friv/injuries.fcgi
+def GetInjuries (csvFileName):
+    injuredPlayers = []
+    lineCount = 0
+    with open(csvFileName) as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        for row in csv_reader:
+            if lineCount == 0:
+                lineCount += 1
+            else:
+                rawName = row[0]
+                findFullName = rawName.find("\\")
+                nameOnly = rawName[0:findFullName]
+                injuredPlayers.append(nameOnly)
+    return injuredPlayers
+
+def GetEligiblePlayers(csvOfAllPlayers, csvOfInjuredPlayers):
+    allPlayers = GetListOfPlayers(csvOfAllPlayers)
+    injuredPlayers = GetInjuries(csvOfInjuredPlayers)
+    eligiblePlayers = []
+    finalList = []
+
+    # TODO: NOT WORING -- RETURNING INJURED PLAYERS IN LIST
+    for player in allPlayers:
+        eligiblePlayers.append(player.name)
+
+    for eligible in eligiblePlayers:
+        playerIsInjured=False
+        for injured in injuredPlayers:
+            if injured in eligible:
+                playerIsInjured=True
+          
+        if playerIsInjured==False:
+            finalList.append(eligible)
+
+    return finalList
+
 
 def GetNBAId(playerFullName):
     playerObj=players.find_players_by_full_name(playerFullName)
@@ -129,9 +167,13 @@ def BreakOutGame(listOfPlayers):
 
 def main():
     #print BackToBack("John Wall")
-    allPlayers = GetListOfPlayers('DKSalaries.csv')
-    breakOut = BreakOutGame(allPlayers)
-    print(breakOut)
+    # allPlayers = GetListOfPlayers('DKSalaries.csv')
+    # breakOut = BreakOutGame(allPlayers)
+    # print(breakOut)
+    # injuredPlayers = GetInjuries('injuries.csv')
+    # print(injuredPlayers)
+    eligibleList = GetEligiblePlayers('DKSalaries.csv', 'injuries.csv')
+    print(eligibleList)
     # player = getBoxScoreForPlayer("Tobias Harris")
     # fantasyPoints = FantasyScoreFromSingleGame(player)
     # print fantasyPoints
