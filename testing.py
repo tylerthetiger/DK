@@ -120,7 +120,7 @@ def GetListOfPlayers(csvFileName):
                 opponent=getOpponent(row[6],row[7])
                 location=getLocation(row[6],row[7])
                 tempPlayerObj=Player(row[2],row[3],row[4],row[8],row[5],row[7],opponent,location)
-                print tempPlayerObj
+                #print tempPlayerObj
                 #tempPlayerObj = Player(row[2], row[3], row[4], row[8], row[5], row[[7], opponent, location)
                # tempPlayerObj = Player(row[2], row[3], 3,4,5,6,7,8 )
 
