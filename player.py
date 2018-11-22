@@ -1,4 +1,5 @@
 class Player:
+    ##TODO, should just pass in game info and team abbrev and prase out next opponent and nextgamelocation here instead of callee
     def __init__(self,name,NBAplayerID,position,avgPoints,salary,team,nextOpponent,nextGameLocation):
         self.name = name
         self.NBAplayerID = NBAplayerID
