@@ -25,9 +25,11 @@ class Player:
 def BackToBack(playerName):
     yesterdayGames = client.player_box_scores(day=20, month=11, year=2018) #TODO calculate yesterday date with datetime
     for boxscore in yesterdayGames:
-        if boxscore['name'] == playerName:
+        if boxscore['name'] in playerName:
             return True
     return False
+def FantasyScoreFromSingleGame(BoxScoreEntry):
+    return 0 #TODO calculate fantasy points for a single game given a box score
 
 def GetListOfPlayers(csvFileName):
     listOfPlayers = []
@@ -48,7 +50,7 @@ def GetNBAId(playerFullName):
     playerObj=players.find_players_by_full_name(playerFullName)
     return playerObj[0]["id"]
 def main():
-    print BackToBack("John Wall")
+    print BackToBack("Tim Hardaway Jr.")
    # eligiblePlayers = GetListOfPlayers("./DKSalaries.csv")
    # for player in eligiblePlayers:
    #     print player
