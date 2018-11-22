@@ -20,6 +20,21 @@ def getBoxScoreForPlayer(playerName):
             return boxscore
     return None
 
+###TODO fix these, this is assuming all team abbreviations are 3 letters long, doesn't hold for GS
+def getLocation(gameInfo,teamAbbrev):
+    team1=gameInfo[0:3]#awayteam
+    team2=gameInfo[4:7]#hometeam
+    if teamAbbrev==team1:
+        return "Away"
+    else:
+        return "Home"
+def getOpponent(gameInfo,TeamAbbrev):
+    team1=gameInfo[0:3]#awayteam
+    team2=gameInfo[4:7]#hometeam
+    if TeamAbbrev==team1:
+        return team2
+    else:
+        return team1
 def FantasyScoreFromSingleGame(boxscore):
     #TODO calculate fantasy points for single game
     # print boxscore
@@ -89,7 +104,11 @@ def GetListOfPlayers(csvFileName):
     listOfPlayers = []
     lineCount=0
     with open(csvFileName) as csv_file:
+    #0      1         2   3    4              5     6           7         8 
 #Position,Name + ID,Name,ID,Roster Position,Salary,Game Info,TeamAbbrev,AvgPointsPerGame
+ #  1   
+#name,NBAplayerID,position,avgPoints,salary,team,nextOpponent,nextGameLocation
+#need to parse out opponent and gamelocation
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             if lineCount == 0:
@@ -97,7 +116,14 @@ def GetListOfPlayers(csvFileName):
             else:
                 #TODO addd the actual nba player id not the draft kings ID
                 # print row[2] + " : " + row[3]
-                tempPlayerObj = Player(row[2], row[3], row[4], row[8], row[5])
+               # raise Exception
+                opponent=getOpponent(row[6],row[7])
+                location=getLocation(row[6],row[7])
+                tempPlayerObj=Player(row[2],row[3],row[4],row[8],row[5],row[7],opponent,location)
+                print tempPlayerObj
+                #tempPlayerObj = Player(row[2], row[3], row[4], row[8], row[5], row[[7], opponent, location)
+               # tempPlayerObj = Player(row[2], row[3], 3,4,5,6,7,8 )
+
                 listOfPlayers.append(tempPlayerObj)
     return listOfPlayers
 
@@ -129,7 +155,7 @@ def BreakOutGame(listOfPlayers):
     # return avgScore
 
 def main():
-    # print BackToBack("John Wall")
+    #print BackToBack("John Wall")
     allPlayers = GetListOfPlayers('DKSalaries.csv')
     breakOut = BreakOutGame(allPlayers)
     print(breakOut)
