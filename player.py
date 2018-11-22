@@ -25,7 +25,7 @@ class Player:
 
 def getLocation(gameInfo,teamAbbrev):
     team1=gameInfo[0:gameInfo.find("@")]#awayteam
-    team2=gameInfogameInfo.find("@"):]#hometeam
+    team2=gameInfo[gameInfo.find("@"):]#hometeam
     if teamAbbrev==team1:
         return "Away"
     else:
