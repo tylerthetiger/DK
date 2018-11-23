@@ -1,4 +1,4 @@
-from testing import Player,FantasyScoreFromSingleGame
+from testing import *
 import datetime
 from nba_api.stats.endpoints import commonplayerinfo, playerfantasyprofile,playergamelog
 from nba_api.stats.static import players
@@ -13,6 +13,7 @@ def getBoxScoreForPlayerFromLists(playerName,BoxScoreList):
         if playerName.lower() in boxscore['name'].lower():
             return boxscore
     return None
+    
 def getLastTwoWeeksAveragePoints(playerName):
     dateIndex = 1 #counter to keep track of how many days back we are going
     totalGamesPlayed=0
@@ -34,8 +35,9 @@ def getLastTwoWeeksAveragePoints(playerName):
         averagePoints=(totalFantasyPoints/totalGamesPlayed)
     print "{} played {} games and averaged {} points in last two weeks".format(playerName,totalGamesPlayed,averagePoints)
     return averagePoints
+
 def main():
-    getLastTwoWeeksAveragePoints("LeBron James")
+    getLastTwoWeeksAveragePoints("Dennis Schroder")
     return None
 if __name__=="__main__":
     main()
