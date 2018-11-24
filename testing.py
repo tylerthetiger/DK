@@ -7,14 +7,16 @@ from testing_local import *
 
 ## IN: NBAPlayerID
 ## Return: True if today's game will be a back-to-back, false otherwise
-def BackToBack(playerName):
+def BackToBack(playerObj):
+    playerName = playerObj.name
     yesterdayGames = client.player_box_scores(day=21, month=11, year=2018) #TODO calculate yesterday date with datetime
     for boxscore in yesterdayGames:
         if boxscore['name'] == playerName:
             return True
     return False
 
-def getBoxScoreForPlayer(playerName):
+def getBoxScoreForPlayer(playerObj):
+    playerName = playerObj.name
     yesterdayGames = client.player_box_scores(day=21, month=11, year=2018) #TODO calculate yesterday date with datetime
     for boxscore in yesterdayGames:
         if boxscore['name'] in playerName:
@@ -23,8 +25,6 @@ def getBoxScoreForPlayer(playerName):
 
 
 def FantasyScoreFromSingleGame(boxscore):
-    #TODO calculate fantasy points for single game
-    # print boxscore
     try:
         freeThrowsMade = (boxscore['made_free_throws'])
     except:
@@ -102,6 +102,7 @@ def GetListOfPlayers(csvFileName):
     return listOfPlayers
 
 # get list of injured players from https://www.basketball-reference.com/friv/injuries.fcgi
+# returns a list of names of players that are injured
 def GetInjuries (csvFileName):
     injuredPlayers = []
     lineCount = 0
@@ -123,14 +124,13 @@ def GetEligiblePlayers(csvOfAllPlayers, csvOfInjuredPlayers):
     eligiblePlayers = []
     finalList = []
 
-    # TODO: NOT WORING -- RETURNING INJURED PLAYERS IN LIST
     for player in allPlayers:
-        eligiblePlayers.append(player.name)
+        eligiblePlayers.append(player)
 
     for eligible in eligiblePlayers:
         playerIsInjured=False
         for injured in injuredPlayers:
-            if injured in eligible:
+            if injured in eligible.name:
                 playerIsInjured=True
           
         if playerIsInjured==False:
@@ -167,23 +167,20 @@ def BreakOutGame(listOfPlayers):
     # return avgScore
 
 def main():
-    #print BackToBack("John Wall")
-    # allPlayers = GetListOfPlayers('DKSalaries.csv')
-    # breakOut = BreakOutGame(allPlayers)
-    # print(breakOut)
-    # injuredPlayers = GetInjuries('injuries.csv')
-    # print(injuredPlayers)
+    allPlayers = GetListOfPlayers('DKSalaries.csv')
+    breakOut = BreakOutGame(allPlayers)
+    print(breakOut)
+    injuredPlayers = GetInjuries('injuries.csv')
+    print(injuredPlayers)
     eligibleList = GetEligiblePlayers('DKSalaries.csv', 'injuries.csv')
     for player in eligibleList:
         getLastTwoWeeksAveragePoints(player)
 
-    #print(eligibleList)
-    # player = getBoxScoreForPlayer("Tobias Harris")
-    # fantasyPoints = FantasyScoreFromSingleGame(player)
-    # print fantasyPoints
-   # eligiblePlayers = GetListOfPlayers("./DKSalaries.csv")
-   # for player in eligiblePlayers:
-   #     print player
-    #print GetNBAId("Kevin Love")
+    print(eligibleList)
+    player = getBoxScoreForPlayer("Tobias Harris")
+    fantasyPoints = FantasyScoreFromSingleGame(player)
+    print fantasyPoints
+    eligiblePlayers = GetListOfPlayers("./DKSalaries.csv")
+    print GetNBAId("Kevin Love")
 if __name__=="__main__":
     main()

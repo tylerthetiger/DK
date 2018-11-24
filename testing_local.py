@@ -14,7 +14,8 @@ def getBoxScoreForPlayerFromLists(playerName,BoxScoreList):
             return boxscore
     return None
     
-def getLastTwoWeeksAveragePoints(playerName):
+def getLastTwoWeeksAveragePoints(playerObj):
+    playerName = playerObj.name
     dateIndex = 1 #counter to keep track of how many days back we are going
     totalGamesPlayed=0
     totalFantasyPoints=0
