@@ -5,8 +5,14 @@ class Player:
         self.nameplusid=row[1]
         # account for misspelled names
         self.name = row[2]
-        if self.name = 'Juancho Hernangomez':
+        if self.name == 'Juancho Hernangomez':
             self.name = 'Juan Hernangomez'
+        if self.name == 'Otto Porter Jr.':
+            self.name = 'Otto Porter'
+        if self.name == 'Wendell Carter Jr.':
+            self.name = 'Wendell Carter'
+        if self.name == 'Kelly Oubre Jr.':
+            self.name = 'Kelly Oubre'
         self.NBAplayerID = row[3]
         self.rosterposition = row[4]
         self.salary = row[5]
