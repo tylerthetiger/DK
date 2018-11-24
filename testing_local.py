@@ -4,6 +4,7 @@ from nba_api.stats.endpoints import commonplayerinfo, playerfantasyprofile,playe
 from nba_api.stats.static import players
 from basketball_reference_web_scraper import client
 from player import writePlayerProjectsionToCSV, FantasyScoreFromSingleGame, GetEligiblePlayers,GetProjection
+import sys
 today=datetime.datetime.today().strftime('%m/%d/%Y')
 yesterday=(datetime.datetime.now() - datetime.timedelta(1)).strftime('%m/%d/%Y')
 
@@ -16,7 +17,10 @@ def GetOptimizedLineup(csvFileName):
         print lineup
 def main():
     #getLastTwoWeeksAveragePoints("Dennis Schroder")
-    eligibleList = GetEligiblePlayers('DKSalaries-Contest1.csv', 'injuries.csv')
+    if (len(sys.argv)<2):
+        print 'Usage python {} <csvTouse>'.format(sys.argv[0])
+        sys.exit(0)
+    eligibleList = GetEligiblePlayers(sys.argv[1], 'injuries.csv')
     print 'finished getting list of eligible players ({} players)'.format(str(len(eligibleList)))
     print 'getting player projections'
     GetProjection(eligibleList,debugoutput=True)
