@@ -151,15 +151,14 @@ def BreakOutGame(listOfPlayers):
         avgScore = float(player.avgPoints)
         name = player.name
     #calculate Fantasy Score
-        score = getBoxScoreForPlayer(name)
+        score = getBoxScoreForPlayer(player)
         fantasyPoints = FantasyScoreFromSingleGame(score)
         breakoutScore = avgScore * 1.25
     #determine if breakout game
         if fantasyPoints == 0:
             pass 
         elif fantasyPoints >= breakoutScore:
-            tempBreakOut = (name, fantasyPoints)
-            breakOutPlayers.append(tempBreakOut)
+            breakOutPlayers.append(player)
         else:
             pass
     #put in list if breakout game
@@ -174,6 +173,7 @@ def main():
     print(injuredPlayers)
     eligibleList = GetEligiblePlayers('DKSalaries.csv', 'injuries.csv')
     for player in eligibleList:
+        print BackToBack(player)
         getLastTwoWeeksAveragePoints(player)
 
     print(eligibleList)
