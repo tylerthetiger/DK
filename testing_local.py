@@ -34,7 +34,7 @@ def getLastTwoWeeksAveragePoints(playerObj):
         averagePoints=0
     else:
         averagePoints=(totalFantasyPoints/totalGamesPlayed)
-    print "{} played {} games and averaged {} points in last two weeks".format(playerName,totalGamesPlayed,averagePoints)
+    # print "{} played {} games and averaged {} points in last two weeks".format(playerName,totalGamesPlayed,averagePoints)
     return averagePoints
 
 def main():

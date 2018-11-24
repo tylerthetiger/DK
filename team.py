@@ -75,7 +75,6 @@ class Team:
 					if row[1] == teamMapping[teamabbrev]:
 						#matched the team we are looking for
 						foundTeam = True
-					#TODO get home rating, away rating
 						self.homeRanking = row[5]
 						self.awayRanking = row[6]
 

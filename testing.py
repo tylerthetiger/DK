@@ -165,22 +165,24 @@ def BreakOutGame(listOfPlayers):
     return breakOutPlayers
     # return avgScore
 
-def main():
-    allPlayers = GetListOfPlayers('DKSalaries.csv')
-    breakOut = BreakOutGame(allPlayers)
-    print(breakOut)
-    injuredPlayers = GetInjuries('injuries.csv')
-    print(injuredPlayers)
-    eligibleList = GetEligiblePlayers('DKSalaries.csv', 'injuries.csv')
-    for player in eligibleList:
-        print BackToBack(player)
-        getLastTwoWeeksAveragePoints(player)
+def GetProjection(listOfPlayers):
 
-    print(eligibleList)
-    player = getBoxScoreForPlayer("Tobias Harris")
-    fantasyPoints = FantasyScoreFromSingleGame(player)
-    print fantasyPoints
-    eligiblePlayers = GetListOfPlayers("./DKSalaries.csv")
-    print GetNBAId("Kevin Love")
+    for player in listOfPlayers:
+        projectedPoints = getLastTwoWeeksAveragePoints(player)
+        player.projection = projectedPoints
+
+def main():
+    eligibleList = GetEligiblePlayers('DKSalaries-Contest1.csv', 'injuries.csv')
+    GetProjection(eligibleList[0:2])
+    for player in eligibleList[0:2]:
+        print(player)
+
+
+    # print(eligibleList)
+    # player = getBoxScoreForPlayer("Tobias Harris")
+    # fantasyPoints = FantasyScoreFromSingleGame(player)
+    # print fantasyPoints
+    # eligiblePlayers = GetListOfPlayers("./DKSalaries.csv")
+    # print GetNBAId("Kevin Love")
 if __name__=="__main__":
     main()
