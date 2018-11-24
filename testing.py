@@ -22,7 +22,7 @@ def getBoxScoreForPlayer(playerObj):
     dateToPull=(datetime.datetime.now() - datetime.timedelta(1))
     yesterdayGames = client.player_box_scores(day=dateToPull.day, month=dateToPull.month, year=dateToPull.year)
     for boxscore in yesterdayGames:
-        if boxscore['name'] in playerName:
+        if boxscore['name'] in playerName or playerName in boxscore['name']:
             return boxscore
     return None
 
@@ -179,8 +179,8 @@ def GetProjection(listOfPlayers):
 
 def main():
     eligibleList = GetEligiblePlayers('DKSalaries-Contest1.csv', 'injuries.csv')
-    GetProjection(eligibleList)
-    for player in eligibleList:
+    GetProjection(eligibleList[0:33])
+    for player in eligibleList[0:33]:
         print(player)
 
 
