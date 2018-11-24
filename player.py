@@ -158,7 +158,7 @@ def BackToBack(playerObj):
         if boxscore['name'] in playerName or playerName in boxscore['name']:
             return True
     return False
-    
+
 # get list of injured players from https://www.basketball-reference.com/friv/injuries.fcgi
 # returns a list of names of players that are injured
 def GetInjuries (csvFileName):
@@ -176,8 +176,10 @@ def GetInjuries (csvFileName):
                 injuredPlayers.append(nameOnly)
     return injuredPlayers
 
-def GetProjection(listOfPlayers):
+def GetProjection(listOfPlayers,debugoutput=False):
     for player in listOfPlayers:
+        if debugoutput:
+            print 'getting projection for {}'.format(player.name)
         lastTwoWeekAverage = projectedPoints = getLastTwoWeeksAveragePoints(player)#baseline projected points
         playerIsBackToBack = BackToBack(player)
         if playerIsBackToBack:

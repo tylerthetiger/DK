@@ -17,8 +17,13 @@ def GetOptimizedLineup(csvFileName):
 def main():
     #getLastTwoWeeksAveragePoints("Dennis Schroder")
     eligibleList = GetEligiblePlayers('DKSalaries-Contest1.csv', 'injuries.csv')
-    GetProjection(eligibleList)
+    print 'finished getting list of eligible players ({} players)'.format(str(len(eligibleList)))
+    print 'getting player projections'
+    GetProjection(eligibleList,debugoutput=True)
+    print 'finished getting projections'
     writePlayerProjectsionToCSV('DKSalaries-projected.csv',eligibleList)
+    print 'finished writing out projections to csv'
+    print 'getting optimized lineup'
     GetOptimizedLineup('DKSalaries-projected.csv')
 
     return None
