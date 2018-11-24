@@ -4,12 +4,14 @@ from basketball_reference_web_scraper import client
 from player import Player
 import csv
 from testing_local import *
+import datetime
 
 ## IN: NBAPlayerID
 ## Return: True if today's game will be a back-to-back, false otherwise
 def BackToBack(playerObj):
     playerName = playerObj.name
-    yesterdayGames = client.player_box_scores(day=21, month=11, year=2018) #TODO calculate yesterday date with datetime
+    dateToPull=(datetime.datetime.now() - datetime.timedelta(1))
+    yesterdayGames = client.player_box_scores(day=dateToPull.day, month=dateToPull.month, year=dateToPull.year)
     for boxscore in yesterdayGames:
         if boxscore['name'] == playerName:
             return True
@@ -17,7 +19,8 @@ def BackToBack(playerObj):
 
 def getBoxScoreForPlayer(playerObj):
     playerName = playerObj.name
-    yesterdayGames = client.player_box_scores(day=21, month=11, year=2018) #TODO calculate yesterday date with datetime
+    dateToPull=(datetime.datetime.now() - datetime.timedelta(1))
+    yesterdayGames = client.player_box_scores(day=dateToPull.day, month=dateToPull.month, year=dateToPull.year)
     for boxscore in yesterdayGames:
         if boxscore['name'] in playerName:
             return boxscore
@@ -166,15 +169,18 @@ def BreakOutGame(listOfPlayers):
     # return avgScore
 
 def GetProjection(listOfPlayers):
-
     for player in listOfPlayers:
-        projectedPoints = getLastTwoWeeksAveragePoints(player)
+        lastTwoWeekAverage = projectedPoints = getLastTwoWeeksAveragePoints(player)#baseline projected points
+        playerIsBackToBack = BackToBack(player)
+        if playerIsBackToBack:
+            projectedPoints = projectedPoints - 0.01*projectedPoints  #1% decrease if playing in a back to back
+        ##todo, give a boost if the opponent is coming off of a back to back
         player.projection = projectedPoints
 
 def main():
     eligibleList = GetEligiblePlayers('DKSalaries-Contest1.csv', 'injuries.csv')
-    GetProjection(eligibleList[0:2])
-    for player in eligibleList[0:2]:
+    GetProjection(eligibleList)
+    for player in eligibleList:
         print(player)
 
 
