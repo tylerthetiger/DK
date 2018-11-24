@@ -24,10 +24,10 @@ class Player:
         self.nextGameLocation = getLocation(row[6],self.team)#should be home or away
         self.projection = 0
     def __repr__(self):
-        return 'Player({},{},{},{},{},{},{},{})'.format(self.name,self.NBAplayerID,self.position,self.avgPoints,self.salary,self.team,self.nextOpponent,self.nextGameLocation,self.projection)
+        return 'Player({},{},{},{},{},{},{},{},{})'.format(self.name,self.NBAplayerID,self.position,self.avgPoints,self.salary,self.team,self.nextOpponent,self.nextGameLocation,self.projection)
        # return (self.name + ', ' + self.position + ', ' + self.avgPoints + ', ' + self.salary)
     def __str__(self):
-        return '{},{},{},{},{},{},{},{}'.format(self.name,self.NBAplayerID,self.position,self.avgPoints,self.salary,self.team,self.nextOpponent,self.nextGameLocation,self.projection)
+        return '{},{},{},{},{},{},{},{},{}'.format(self.name,self.NBAplayerID,self.position,self.avgPoints,self.salary,self.team,self.nextOpponent,self.nextGameLocation,self.projection)
 
         #return (self.name + ', ' + self.position + ', ' + self.avgPoints + ', ' + self.salary)
 
