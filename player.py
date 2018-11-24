@@ -3,7 +3,10 @@ class Player:
         #name,NBAplayerID,position,avgPoints,salary,team,nextOpponent,nextGameLocation
         self.position=row[0]
         self.nameplusid=row[1]
+        # account for misspelled names
         self.name = row[2]
+        if self.name = 'Juancho Hernangomez':
+            self.name = 'Juan Hernangomez'
         self.NBAplayerID = row[3]
         self.rosterposition = row[4]
         self.salary = row[5]
