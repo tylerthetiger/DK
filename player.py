@@ -82,7 +82,7 @@ def getBoxScoreForPlayerFromLists(playerName,BoxScoreList):
     for boxscore in BoxScoreList:
         #print boxscore['name']
         #print playerName
-        if playerName.lower() in boxscore['name'].lower():
+        if playerName.lower() in boxscore['name'].lower() or playerName.lower() in boxscore['name'].lower():
             return boxscore
     return None
 def FantasyScoreFromSingleGame(boxscore):
