@@ -30,7 +30,7 @@ def getAverageHomeRanking(csvFileName):
 			if lineCount==0:
 				lineCount+=1
 			else:
-				print row
+				# print row
 				numTeams+=1
 				totalValue+=float(row[5])
 	if numTeams == 0:
@@ -51,7 +51,7 @@ def getAverageAwayRanking(csvFileName):
 			if lineCount==0:
 				lineCount+=1
 			else:
-				print row
+				# print row
 				numTeams+=1
 				totalValue+=float(row[6])
 	if numTeams == 0:
@@ -84,6 +84,7 @@ class Team:
 			raise Exception
 
 def main():
-	getAverageAwayRanking('defensive_ranking.csv')
+	awayRank = getAverageAwayRanking('defensive_ranking.csv')
+	print(awayRank)
 if __name__ =="__main__":
 	main()
