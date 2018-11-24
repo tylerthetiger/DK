@@ -1,7 +1,7 @@
 from nba_api.stats.static import players
 from datetime import datetime,timedelta
 from basketball_reference_web_scraper import client
-from player import Player,getLastTwoWeeksAveragePoints
+from player import Player,getLastTwoWeeksAveragePoints, GetEligiblePlayers,GetProjection
 import csv
 import datetime
 
