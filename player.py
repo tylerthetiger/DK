@@ -178,6 +178,8 @@ def GetProjection(listOfPlayers,debugoutput=False):
         if debugoutput:
             print 'getting projection for {}'.format(player.name)
         lastTwoWeekAverage = projectedPoints = getLastTwoWeeksAveragePoints_nbaapi(player)#baseline projected points
+        if debugoutput:
+            print 'done getting 2 week average, getting back to back'
         playerIsBackToBack = BackToBack(player)
         if playerIsBackToBack:
             projectedPoints = projectedPoints - 0.01*projectedPoints  #1% decrease if playing in a back to back
@@ -243,6 +245,7 @@ def getFantasyPointsFromDF(df):
 
     return pointTotal
 ###TESTING### TODO fix this...matching John Wallace for John Wall. 
+##TODO need to put nba plyaer id as a field in player object and use that everywhere instead of name
 def getLastTwoWeeksAveragePoints_nbaapi(playerObj):
     playerName = playerObj.name
     dateIndex = 1 #counter to keep track of how many days back we are going
@@ -254,15 +257,24 @@ def getLastTwoWeeksAveragePoints_nbaapi(playerObj):
     nba_player = players.find_players_by_full_name(playerName)
     playerId=None
     if len(nba_player)!=1:
+        lastName = playerName[playerName.find(" ")+1:]
+        firstName = playerName[0:playerName.find(" ")] 
         print 'len(nba_player) is {} for player: {}'.format(str(len(nba_player)),playerName)
-        for a in nba_player:
-            print a['full_name']
-            print a['id']
-        raise Exception("Bailing")
+        for tmp_player in nba_player:
+            if tmp_player['first_name'] == firstName and tmp_player['last_name']==lastName:
+                print 'found match for ' + playerName + 'id: ' + str(tmp_player['id'])
+                playerId = tmp_player['id']
+            print tmp_player['full_name']
+            print tmp_player['id']
+        if playerId == None:
+            print "Unable to determine player id for {}".format(playerName)
+            return 0
     else:
         playerId = nba_player[0]['id']
+    #print 'about to get player log...'
     gameLog = playergamelog.PlayerGameLog(playerId,date_from_nullable=dateToPull,date_to_nullable=today)
     gameLogDf=gameLog.get_data_frames()[0]
+   # print 'done getting player log'
     totalFantasyPoints = getFantasyPointsFromDF(gameLogDf)
     if len(gameLogDf)==0:
         print "{} played 0 games!".format(playerName)
