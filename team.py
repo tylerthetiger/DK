@@ -77,29 +77,75 @@ def teamBacktoBack(teamAbbr):
 	# print(entry)
 
 class Team:
-	def __init__(self,teamabbrev):
-		lineCount=0
-		foundTeam = False
-		with open('defensive_ranking.csv') as csv_file:
-			csv_reader = csv.reader(csv_file, delimiter='\t')
-			for row in csv_reader:
-				if lineCount == 0:
-					lineCount+=1 #skip the header
-				else:
-					if row[1] == teamMapping[teamabbrev]:
-						#matched the team we are looking for
-						foundTeam = True
-						self.homeRanking = row[5]
-						self.awayRanking = row[6]
+	def __init__(self,row):
+		self.name = row[1]
+		self.homeRanking = row[5]
+		self.awayRanking = row[6]
+		# lineCount=0
+		# foundTeam = False
+		# with open('defensive_ranking.csv') as csv_file:
+		# 	csv_reader = csv.reader(csv_file, delimiter='\t')
+		# 	for row in csv_reader:
+		# 		if lineCount == 0:
+		# 			lineCount+=1 #skip the header
+		# 		else:
+		# 			if row[1] == teamMapping[row[1]]:
+		# 				#matched the team we are looking for
+		# 				foundTeam = True
+		# 				self.homeRanking = row[5]
+		# 				self.awayRanking = row[6]
 
-		if foundTeam == False:
-			print 'couldnt find team'
-			raise Exception
+		# if foundTeam == False:
+		# 	print 'couldnt find team'
+		# 	raise Exception
+
+	def __repr__(self):
+		return 'Team({},{},{})'.format(self.name,self.homeRanking,self.awayRanking)
+	def __str__(self):
+		return '{},{},{}'.format(self.name,self.homeRanking,self.awayRanking)
+
+def getListOfTeams(csvFileName):
+    listOfTeams = []
+    lineCount=0
+    with open(csvFileName) as csv_file:
+       csv_reader = csv.reader(csv_file, delimiter='\t')
+       for row in csv_reader:
+            if lineCount == 0:
+                lineCount+=1 #skip the header
+            else:
+                #TODO addd the actual nba player id not the draft kings ID
+                tempTeamObj=Team(row)
+                listOfTeams.append(tempTeamObj)
+    return listOfTeams
+
+# get whether todays game is home or away
+def getTeamHomeAway(csvFileName):
+	awayTeam = []
+	homeTeam = []
+	today=datetime.datetime.today().strftime('%b %d %Y')
+	lineCount=0
+	with open(csvFileName) as csv_file:
+		csv_reader = csv.reader(csv_file, delimiter=',')
+		for row in csv_reader:
+			if lineCount == 0:
+				lineCount+=1 #skip the header
+			else:
+				if today in row[0] or row[0] in today:
+					awayTeam.append(row[4])
+					homeTeam.append(row[2])
+				else:
+					pass
+	return awayTeam, homeTeam
+
+# find deviation from average to include in player projection
+def getDefensiveDeviationFromAverage(teamAbbr):
+	return None
 
 def main():
 	# awayRank = getAverageAwayRanking('defensive_ranking.csv')
 	# print(awayRank)
-	team = teamBacktoBack('DEN')
-	print(team)
+	# team = teamBacktoBack('DEN')
+	defense = getTeamHomeAway('nov_schedule_test.csv')
+	print(defense)
 if __name__ =="__main__":
 	main()

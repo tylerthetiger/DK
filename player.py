@@ -12,9 +12,6 @@ class Player:
         self.nameplusid=row[1]
         # account for misspelled names
         self.name = row[2]
-        #if self.name == 'Juancho Hernangomez':
-        #    self.name = 'Juan Hernangomez'
-        
         self.NBAplayerID = row[3]
         self.rosterposition = row[4]
         self.salary = row[5]
@@ -56,6 +53,7 @@ def getOpponent(gameInfo,TeamAbbrev):
         return homeTeam
     else:
         return awayTeam
+        
 def GetEligiblePlayers(csvOfAllPlayers, csvOfInjuredPlayers):
     allPlayers = GetListOfPlayers(csvOfAllPlayers)
     injuredPlayers = GetInjuries(csvOfInjuredPlayers)
