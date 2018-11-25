@@ -48,12 +48,12 @@ def getLocation(gameInfo,teamAbbrev):
 def getOpponent(gameInfo,TeamAbbrev):
     #gameinfo example = GS@POR
     awayTeam=gameInfo[0:gameInfo.find("@")]#awayteam
-    homeTeam=gameInfo[gameInfo.find("@")+1:]#hometeam
+    homeTeam=gameInfo[gameInfo.find("@")+1:gameInfo.find(" ")]#hometeam
     if TeamAbbrev==awayTeam:
         return homeTeam
     else:
         return awayTeam
-        
+
 def GetEligiblePlayers(csvOfAllPlayers, csvOfInjuredPlayers):
     allPlayers = GetListOfPlayers(csvOfAllPlayers)
     injuredPlayers = GetInjuries(csvOfInjuredPlayers)
@@ -176,7 +176,7 @@ def GetProjection(listOfPlayers,debugoutput=True):
     for player in listOfPlayers:
         if debugoutput:
             print 'getting projection for {}'.format(player.name)
-        lastTwoWeekAverage = projectedPoints = getLastTwoWeeksAveragePoints_nbaapi(player)#baseline projected points
+        lastTwoWeekAverage = projectedPoints = getLastTwoWeeksAveragePoints(player)#baseline projected points
         if debugoutput:
             print 'done getting 2 week average, getting back to back' + str(lastTwoWeekAverage)
         playerIsBackToBack = BackToBack(player)
@@ -190,8 +190,14 @@ def GetProjection(listOfPlayers,debugoutput=True):
         opponentIsBackToBack = teamBacktoBack(opponentTeam)
         if opponentIsBackToBack:
             projectedPoints = projectedPoints + (0.10 * lastTwoWeekAverage)
-
+        if debugoutput:
+            print 'done getting team back to back, getting team defensive rating'
         # TODO adjust based on team defensive ranking
+        # teamCity = teamMapping[opponentTeam]
+        # defenseRanking = getNextGameDefensiveRating('defensive_ranking.csv')
+        # defenseOffset = defenseRanking[teamCity]
+        # projectedPoints = projectedPoints * defenseOffset
+        
         player.projection = projectedPoints
 
 

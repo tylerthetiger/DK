@@ -60,6 +60,7 @@ def getAverageAwayRanking(csvFileName):
 
 def teamBacktoBack(teamAbbr):
 	nba_team = teams.find_team_by_abbreviation(teamAbbr)
+	print(teamAbbr)
 	teamId = nba_team['id']
 
 	date=(datetime.datetime.now() - datetime.timedelta(1)).strftime('%m/%d/%Y')
@@ -157,6 +158,7 @@ def getNextGameDefensiveRating(csvFileName):
 	allTeams = getListOfTeams(csvFileName)
 	homeTeam = getTeamHome('nov_schedule.csv')
 	awayTeam = getTeamAway('nov_schedule.csv')
+	teamOffset = dict()
 
 	for teamobj in allTeams:
 		# print team.name
@@ -164,16 +166,22 @@ def getNextGameDefensiveRating(csvFileName):
 		for home in homeTeam:
 			if teamobj.name in home:
 				teamobj.nextGameDefensiveRating = teamobj.homeRanking
+				homeAvg = getAverageHomeRanking('defensive_ranking.csv')
+				homeOffset = float(teamobj.nextGameDefensiveRating)/homeAvg
+				teamOffset[teamobj.name] = homeOffset
 			else:
 				pass
 
 		for away in awayTeam:
 			if teamobj.name in away:
 				teamobj.nextGameDefensiveRating=teamobj.awayRanking
+				awayAvg = getAverageAwayRanking('defensive_ranking.csv')
+				awayOffset = float(teamobj.nextGameDefensiveRating)/awayAvg
+				teamOffset[teamobj.name] = awayOffset
 			else:
 				pass
-
-		print(teamobj)
+	return teamOffset
+		# print(teamobj)
 
 def main():
 	# awayRank = getAverageAwayRanking('defensive_ranking.csv')
