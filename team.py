@@ -1,10 +1,7 @@
-# do defensive stuff only, maybe integrate offensive rating later
-#first you need to create a dictionary mapping of team abbrev to teamname as csv lists it
-#that way you can do a quick lookup and match in your for loop below
-#teamabbrev will be GS (as draftkings csv lists it)
-#you're doing a list, we want to do a dict
-#also i would do it outside of the class as a global so we don't have to create the dict every time we make a new Team class
 import csv
+import datetime
+from nba_api.stats.endpoints import commonplayerinfo, playerfantasyprofile, playergamelog, teamgamelog
+from nba_api.stats.static import players, teams
 # create a dicionary mapping city abbr to city name for defensive rankings
 teamMapping = dict()
 
@@ -59,8 +56,25 @@ def getAverageAwayRanking(csvFileName):
 		raise Exception
 	else:
 		avgRanking = totalValue/numTeams
-	#	print "Avg away ranking: {}".format(avgRanking)
 		return avgRanking
+
+def teamBacktoBack(teamAbbr):
+	nba_team = teams.find_team_by_abbreviation(teamAbbr)
+	teamId = nba_team['id']
+
+	date=(datetime.datetime.now() - datetime.timedelta(1)).strftime('%m/%d/%Y')
+	# date = '11/23/2018'
+	season = '2018-19'
+	seasonType = 'Regular Season'
+
+	gamelog = teamgamelog.TeamGameLog(season_all=season,season_type_all_star=seasonType,team_id=teamId,date_to_nullable=date,date_from_nullable=date)
+	gameLogDf=gamelog.get_data_frames()[0]
+	entry = len(gameLogDf)
+	if entry == 1:
+		return True
+	else:
+		return False
+	# print(entry)
 
 class Team:
 	def __init__(self,teamabbrev):
@@ -83,7 +97,9 @@ class Team:
 			raise Exception
 
 def main():
-	awayRank = getAverageAwayRanking('defensive_ranking.csv')
-	print(awayRank)
+	# awayRank = getAverageAwayRanking('defensive_ranking.csv')
+	# print(awayRank)
+	team = teamBacktoBack('DEN')
+	print(team)
 if __name__ =="__main__":
 	main()

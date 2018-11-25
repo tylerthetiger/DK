@@ -1,7 +1,8 @@
 import datetime
 import csv
+from team import * 
 from basketball_reference_web_scraper import client
-from nba_api.stats.endpoints import commonplayerinfo, playerfantasyprofile,playergamelog
+from nba_api.stats.endpoints import commonplayerinfo, playerfantasyprofile, playergamelog
 from nba_api.stats.static import players
 
 class Player:
@@ -173,17 +174,26 @@ def GetInjuries (csvFileName):
                 injuredPlayers.append(nameOnly)
     return injuredPlayers
 
-def GetProjection(listOfPlayers,debugoutput=False):
+def GetProjection(listOfPlayers,debugoutput=True):
     for player in listOfPlayers:
         if debugoutput:
             print 'getting projection for {}'.format(player.name)
         lastTwoWeekAverage = projectedPoints = getLastTwoWeeksAveragePoints_nbaapi(player)#baseline projected points
         if debugoutput:
-            print 'done getting 2 week average, getting back to back'
+            print 'done getting 2 week average, getting back to back' + str(lastTwoWeekAverage)
         playerIsBackToBack = BackToBack(player)
+
         if playerIsBackToBack:
-            projectedPoints = projectedPoints - 0.01*projectedPoints  #1% decrease if playing in a back to back
-        ##todo, give a boost if the opponent is coming off of a back to back
+            projectedPoints = projectedPoints - (0.10 * lastTwoWeekAverage)
+        if debugoutput:
+            print 'done getting player back to back, getting team back to back'
+        
+        opponentTeam = player.nextOpponent
+        opponentIsBackToBack = teamBacktoBack(opponentTeam)
+        if opponentIsBackToBack:
+            projectedPoints = projectedPoints + (0.10 * lastTwoWeekAverage)
+
+        # TODO adjust based on team defensive ranking
         player.projection = projectedPoints
 
 
@@ -209,6 +219,7 @@ def getLastTwoWeeksAveragePoints(playerObj):
         averagePoints=(totalFantasyPoints/totalGamesPlayed)
     # print "{} played {} games and averaged {} points in last two weeks".format(playerName,totalGamesPlayed,averagePoints)
     return averagePoints
+
 def getFantasyPointsFromDF(df):
     pointTotal = float(0)
     for i in range(0,len(df)):
@@ -244,10 +255,7 @@ def getFantasyPointsFromDF(df):
 
 
     return pointTotal
-###TESTING### TODO fix this...matching John Wallace for John Wall. 
-##TODO need to put nba plyaer id as a field in player object and use that everywhere instead of name
-##TODO user agent was set to Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36 to make this work
-## how do we actually change this in the nba_api code?
+
 def getLastTwoWeeksAveragePoints_nbaapi(playerObj):
     playerName = playerObj.name
     dateIndex = 1 #counter to keep track of how many days back we are going
@@ -261,23 +269,18 @@ def getLastTwoWeeksAveragePoints_nbaapi(playerObj):
     if len(nba_player)!=1:
         lastName = playerName[playerName.find(" ")+1:]
         firstName = playerName[0:playerName.find(" ")] 
-       # print 'len(nba_player) is {} for player: {}'.format(str(len(nba_player)),playerName)
         for tmp_player in nba_player:
             if tmp_player['first_name'] == firstName and tmp_player['last_name']==lastName:
-               # print 'found match for ' + playerName + 'id: ' + str(tmp_player['id'])
                 playerId = tmp_player['id']
-           # print tmp_player['full_name']
-          #  print tmp_player['id']
         if playerId == None:
             print "Unable to determine player id for {}".format(playerName)
             #TODO - instead of using the static nba api should do dynamic to get these players ID and get their
             return 0
     else:
         playerId = nba_player[0]['id']
-    #print 'about to get player log...'
+    
     gameLog = playergamelog.PlayerGameLog(playerId,date_from_nullable=dateToPull,date_to_nullable=today)
     gameLogDf=gameLog.get_data_frames()[0]
-   # print 'done getting player log'
     totalFantasyPoints = getFantasyPointsFromDF(gameLogDf)
     if len(gameLogDf)==0:
         print "{} played 0 games!".format(playerName)

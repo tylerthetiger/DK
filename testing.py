@@ -45,8 +45,8 @@ def BreakOutGame(listOfPlayers):
 
 def main():
     eligibleList = GetEligiblePlayers('DKSalaries-Contest1.csv', 'injuries.csv')
-    GetProjection(eligibleList[0:2])
-    for player in eligibleList[0:2]:
+    GetProjection(eligibleList)
+    for player in eligibleList:
         print(player)
 
 
