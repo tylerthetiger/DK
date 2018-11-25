@@ -1,6 +1,8 @@
 import datetime
 import csv
 from basketball_reference_web_scraper import client
+from nba_api.stats.endpoints import commonplayerinfo, playerfantasyprofile,playergamelog
+from nba_api.stats.static import players
 
 class Player:
     def __init__(self,row):
@@ -9,14 +11,9 @@ class Player:
         self.nameplusid=row[1]
         # account for misspelled names
         self.name = row[2]
-        if self.name == 'Juancho Hernangomez':
-            self.name = 'Juan Hernangomez'
-        if self.name == 'Otto Porter Jr.':
-            self.name = 'Otto Porter'
-        if self.name == 'Wendell Carter Jr.':
-            self.name = 'Wendell Carter'
-        if self.name == 'Kelly Oubre Jr.':
-            self.name = 'Kelly Oubre'
+        #if self.name == 'Juancho Hernangomez':
+        #    self.name = 'Juan Hernangomez'
+        
         self.NBAplayerID = row[3]
         self.rosterposition = row[4]
         self.salary = row[5]
@@ -180,7 +177,7 @@ def GetProjection(listOfPlayers,debugoutput=False):
     for player in listOfPlayers:
         if debugoutput:
             print 'getting projection for {}'.format(player.name)
-        lastTwoWeekAverage = projectedPoints = getLastTwoWeeksAveragePoints(player)#baseline projected points
+        lastTwoWeekAverage = projectedPoints = getLastTwoWeeksAveragePoints_nbaapi(player)#baseline projected points
         playerIsBackToBack = BackToBack(player)
         if playerIsBackToBack:
             projectedPoints = projectedPoints - 0.01*projectedPoints  #1% decrease if playing in a back to back
@@ -210,6 +207,69 @@ def getLastTwoWeeksAveragePoints(playerObj):
         averagePoints=(totalFantasyPoints/totalGamesPlayed)
     # print "{} played {} games and averaged {} points in last two weeks".format(playerName,totalGamesPlayed,averagePoints)
     return averagePoints
+def getFantasyPointsFromDF(df):
+    pointTotal = float(0)
+    for i in range(0,len(df)):
+        points=df['PTS'][i]
+        threepointers=df['FG3M'][i]
+        rebounds=df['REB'][i]
+        assists=df['AST'][i]
+        steals=df['STL'][i]
+        blocks=df['BLK'][i]
+        turnovers=df['TOV'][i]
+        numberDoubleCategories=0
+        if points>=10:
+            numberDoubleCategories+=1
+        if rebounds>=10:
+            numberDoubleCategories+=1
+        if assists>=10:
+            numberDoubleCategories+=1
+        if blocks>=10:
+            numberDoubleCategories+=1
+        if steals>=10:
+            numberDoubleCategories+=1
+        if numberDoubleCategories>=2:
+            pointTotal+=1.5
+        if numberDoubleCategories>=3:
+            pointTotal+=3
+        pointTotal+=points
+        pointTotal+=(threepointers*0.5)
+        pointTotal+=(rebounds*1.25)
+        pointTotal+=(assists*1.5)
+        pointTotal+=(steals*2)
+        pointTotal+=(blocks*2)
+        pointTotal+=(turnovers*-0.5)
+
+
+    return pointTotal
+###TESTING### TODO fix this...matching John Wallace for John Wall. 
+def getLastTwoWeeksAveragePoints_nbaapi(playerObj):
+    playerName = playerObj.name
+    dateIndex = 1 #counter to keep track of how many days back we are going
+    totalGamesPlayed=0
+    totalFantasyPoints=0
+    today=datetime.datetime.today().strftime('%m/%d/%Y')
+    dateToPull=(datetime.datetime.now() - datetime.timedelta(14)).strftime('%m/%d/%Y')
+
+    nba_player = players.find_players_by_full_name(playerName)
+    playerId=None
+    if len(nba_player)!=1:
+        print 'len(nba_player) is {} for player: {}'.format(str(len(nba_player)),playerName)
+        for a in nba_player:
+            print a['full_name']
+            print a['id']
+        raise Exception("Bailing")
+    else:
+        playerId = nba_player[0]['id']
+    gameLog = playergamelog.PlayerGameLog(playerId,date_from_nullable=dateToPull,date_to_nullable=today)
+    gameLogDf=gameLog.get_data_frames()[0]
+    totalFantasyPoints = getFantasyPointsFromDF(gameLogDf)
+    if len(gameLogDf)==0:
+        print "{} played 0 games!".format(playerName)
+        return 0
+    return totalFantasyPoints/len(gameLogDf)
+    
+
 def GetListOfPlayers(csvFileName):
     listOfPlayers = []
     lineCount=0
