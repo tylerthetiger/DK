@@ -1,6 +1,6 @@
 import csv
 import datetime
-from nba_api.stats.endpoints import commonplayerinfo, playerfantasyprofile, playergamelog, teamgamelog
+from nba_api.stats.endpoints import commonplayerinfo, playerfantasyprofile, playergamelog, teamgamelog, leaguegamelog
 from nba_api.stats.static import players, teams
 # create a dicionary mapping city abbr to city name for defensive rankings
 teamMapping = dict()
@@ -81,6 +81,7 @@ class Team:
 		self.name = row[1]
 		self.homeRanking = row[5]
 		self.awayRanking = row[6]
+		self.nextGameDefensiveRating = -1
 		# lineCount=0
 		# foundTeam = False
 		# with open('defensive_ranking.csv') as csv_file:
@@ -100,9 +101,9 @@ class Team:
 		# 	raise Exception
 
 	def __repr__(self):
-		return 'Team({},{},{})'.format(self.name,self.homeRanking,self.awayRanking)
+		return 'Team({},{},{},{})'.format(self.name,self.homeRanking,self.awayRanking,self.nextGameDefensiveRating)
 	def __str__(self):
-		return '{},{},{}'.format(self.name,self.homeRanking,self.awayRanking)
+		return '{},{},{},{}'.format(self.name,self.homeRanking,self.awayRanking,self.nextGameDefensiveRating)
 
 def getListOfTeams(csvFileName):
     listOfTeams = []
@@ -119,9 +120,8 @@ def getListOfTeams(csvFileName):
     return listOfTeams
 
 # get whether todays game is home or away
-def getTeamHomeAway(csvFileName):
+def getTeamAway(csvFileName):
 	awayTeam = []
-	homeTeam = []
 	today=datetime.datetime.today().strftime('%b %d %Y')
 	lineCount=0
 	with open(csvFileName) as csv_file:
@@ -132,20 +132,55 @@ def getTeamHomeAway(csvFileName):
 			else:
 				if today in row[0] or row[0] in today:
 					awayTeam.append(row[4])
+				else:
+					pass
+	return awayTeam
+
+def getTeamHome(csvFileName):
+	homeTeam = []
+	today=datetime.datetime.today().strftime('%b %d %Y')
+	lineCount=0
+	with open(csvFileName) as csv_file:
+		csv_reader = csv.reader(csv_file, delimiter=',')
+		for row in csv_reader:
+			if lineCount == 0:
+				lineCount+=1 #skip the header
+			else:
+				if today in row[0] or row[0] in today:
 					homeTeam.append(row[2])
 				else:
 					pass
-	return awayTeam, homeTeam
+	return homeTeam
 
 # find deviation from average to include in player projection
-def getDefensiveDeviationFromAverage(teamAbbr):
-	return None
+def getNextGameDefensiveRating(csvFileName):
+	allTeams = getListOfTeams(csvFileName)
+	homeTeam = getTeamHome('nov_schedule.csv')
+	awayTeam = getTeamAway('nov_schedule.csv')
+
+	for teamobj in allTeams:
+		# print team.name
+		# print team.awayRanking
+		for home in homeTeam:
+			if teamobj.name in home:
+				teamobj.nextGameDefensiveRating = teamobj.homeRanking
+			else:
+				pass
+
+		for away in awayTeam:
+			if teamobj.name in away:
+				teamobj.nextGameDefensiveRating=teamobj.awayRanking
+			else:
+				pass
+
+		print(teamobj)
 
 def main():
 	# awayRank = getAverageAwayRanking('defensive_ranking.csv')
 	# print(awayRank)
 	# team = teamBacktoBack('DEN')
-	defense = getTeamHomeAway('nov_schedule_test.csv')
-	print(defense)
+	# defense = getTeamHomeAway('nov_schedule_test.csv')
+	city = getNextGameDefensiveRating('defensive_ranking.csv')
+	print(city)
 if __name__ =="__main__":
 	main()
