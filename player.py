@@ -246,6 +246,8 @@ def getFantasyPointsFromDF(df):
     return pointTotal
 ###TESTING### TODO fix this...matching John Wallace for John Wall. 
 ##TODO need to put nba plyaer id as a field in player object and use that everywhere instead of name
+##TODO user agent was set to Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36 to make this work
+## how do we actually change this in the nba_api code?
 def getLastTwoWeeksAveragePoints_nbaapi(playerObj):
     playerName = playerObj.name
     dateIndex = 1 #counter to keep track of how many days back we are going
@@ -259,15 +261,16 @@ def getLastTwoWeeksAveragePoints_nbaapi(playerObj):
     if len(nba_player)!=1:
         lastName = playerName[playerName.find(" ")+1:]
         firstName = playerName[0:playerName.find(" ")] 
-        print 'len(nba_player) is {} for player: {}'.format(str(len(nba_player)),playerName)
+       # print 'len(nba_player) is {} for player: {}'.format(str(len(nba_player)),playerName)
         for tmp_player in nba_player:
             if tmp_player['first_name'] == firstName and tmp_player['last_name']==lastName:
-                print 'found match for ' + playerName + 'id: ' + str(tmp_player['id'])
+               # print 'found match for ' + playerName + 'id: ' + str(tmp_player['id'])
                 playerId = tmp_player['id']
-            print tmp_player['full_name']
-            print tmp_player['id']
+           # print tmp_player['full_name']
+          #  print tmp_player['id']
         if playerId == None:
             print "Unable to determine player id for {}".format(playerName)
+            #TODO - instead of using the static nba api should do dynamic to get these players ID and get their
             return 0
     else:
         playerId = nba_player[0]['id']

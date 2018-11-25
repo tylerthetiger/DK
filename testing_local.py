@@ -23,7 +23,7 @@ def main():
     eligibleList = GetEligiblePlayers(sys.argv[1], 'injuries.csv')
     print 'finished getting list of eligible players ({} players)'.format(str(len(eligibleList)))
     print 'getting player projections'
-    GetProjection(eligibleList,debugoutput=True)
+    GetProjection(eligibleList,debugoutput=False)
     print 'finished getting projections'
     writePlayerProjectsionToCSV('DKSalaries-projected.csv',eligibleList)
     print 'finished writing out projections to csv'
