@@ -4,9 +4,15 @@ from basketball_reference_web_scraper.errors import InvalidDate
 from basketball_reference_web_scraper.parsers.box_scores import parse_player_box_scores
 from basketball_reference_web_scraper.parsers.schedule import parse_schedule, parse_schedule_for_month_url_paths
 from basketball_reference_web_scraper.parsers.players_season_totals import parse_players_season_totals
-
+from basketball_reference_web_scraper.parsers.injury_report import parse_injury_report
 BASE_URL = 'https://www.basketball-reference.com'
 
+
+def injury_report():
+    url = '{BASE_URL}/friv/injuries.fcgi'.format(BASE_URL=BASE_URL)
+    response = requests.get(url=url, allow_redirects=False)
+    if 200 <= response.status_code < 300:
+        return parse_injury_report(response.content)
 
 def player_box_scores(day, month, year):
     url = '{BASE_URL}/friv/dailyleaders.cgi?month={month}&day={day}&year={year}'.format(
