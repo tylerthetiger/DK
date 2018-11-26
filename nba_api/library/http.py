@@ -98,7 +98,7 @@ class NBAHTTP:
                 print('loading from file...')
 
         if not contents:
-            response = requests.get(url=base_url, params=parameters, headers=headers, proxies=proxies)
+            response = requests.get(url=base_url, params=parameters, headers=headers, proxies=proxies,timeout=5)
             url = response.url
             contents = response.text
 

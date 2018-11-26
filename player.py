@@ -20,6 +20,8 @@ class Player:
         self.avgPoints = row[8]
         self.team = row[7] #this is the team that the player is on
         self.nextOpponent = getOpponent(row[6],self.team)
+        if self.nextOpponent == "NY":
+            self.nextOpponent = "NYK" #fix for draftkings/nba api compatibility
         self.nextGameLocation = getLocation(row[6],self.team)#should be home or away
         self.projection = 0
     def __repr__(self):
@@ -172,11 +174,14 @@ def GetInjuries (csvFileName):
                 injuredPlayers.append(nameOnly)
     return injuredPlayers
 
-def GetProjection(listOfPlayers,debugoutput=True):
+def GetProjection(listOfPlayers,debugoutput=True,usenbaapi=False):
     for player in listOfPlayers:
         if debugoutput:
             print 'getting projection for {}'.format(player.name)
-        lastTwoWeekAverage = projectedPoints = getLastTwoWeeksAveragePoints(player)#baseline projected points
+        if usenbaapi==True:
+            lastTwoWeekAverage = projectedPoints = getLastTwoWeeksAveragePoints_nbaapi(player)#baseline projected points
+        else:
+            lastTwoWeekAverage = projectedPoints = getLastTwoWeeksAveragePoints(player)#baseline projected points
         if debugoutput:
             print 'done getting 2 week average, getting back to back' + str(lastTwoWeekAverage)
         playerIsBackToBack = BackToBack(player)
@@ -187,16 +192,17 @@ def GetProjection(listOfPlayers,debugoutput=True):
             print 'done getting player back to back, getting team back to back'
         
         opponentTeam = player.nextOpponent
-        opponentIsBackToBack = teamBacktoBack(opponentTeam)
+        opponentIsBackToBack = teamBacktoBack_bballreference(opponentTeam)
         if opponentIsBackToBack:
             projectedPoints = projectedPoints + (0.10 * lastTwoWeekAverage)
         if debugoutput:
             print 'done getting team back to back, getting team defensive rating'
-        # TODO adjust based on team defensive ranking
-        # teamCity = teamMapping[opponentTeam]
-        # defenseRanking = getNextGameDefensiveRating('defensive_ranking.csv')
-        # defenseOffset = defenseRanking[teamCity]
-        # projectedPoints = projectedPoints * defenseOffset
+        #TODO adjust based on team defensive ranking
+        teamCity = teamMapping[opponentTeam]
+        defenseRanking = getNextGameDefensiveRating('defensive_ranking.csv')
+        print defenseRanking
+        defenseOffset = defenseRanking[teamCity]
+        projectedPoints = projectedPoints * defenseOffset
         
         player.projection = projectedPoints
 
@@ -282,8 +288,16 @@ def getLastTwoWeeksAveragePoints_nbaapi(playerObj):
             return 0
     else:
         playerId = nba_player[0]['id']
-    
-    gameLog = playergamelog.PlayerGameLog(playerId,date_from_nullable=dateToPull,date_to_nullable=today)
+    attempts=0
+    while attempts<5:
+        try:    
+            gameLog = playergamelog.PlayerGameLog(playerId,date_from_nullable=dateToPull,date_to_nullable=today)
+        except:
+            print "nba api timed out, waiting 10 minutes then trying again.  Attempt {} of 5".format(attempts)
+            attempts+=1
+            time.sleep(600)
+    if gameLog == None:
+        raise Exception("NBA API still not working after 5 attempts and waiting 10 minutes, bailing")
     gameLogDf=gameLog.get_data_frames()[0]
     totalFantasyPoints = getFantasyPointsFromDF(gameLogDf)
     if len(gameLogDf)==0:
