@@ -7,6 +7,10 @@ from basketball_reference_web_scraper import client,data #needed for team abbrev
 # create a dicionary mapping city abbr to city name for defensive rankings
 teamMapping = dict()
 
+##TODO create a parser for https://www.basketball-reference.com/leagues/NBA_2019_ratings.html and use that for defensive ranking
+#restructure all of this code to create a list of Team objects that hold all the information that Player() needs to make projections
+#include a reference in the player to the Team object/list entry for the opponent and the player's team.
+
 #get the 2019 schedule from basketball reference.  Only do this once!
 schedule_2019 = client.season_schedule(season_end_year=2019)
 yesterday=(datetime.datetime.now() - datetime.timedelta(1))
