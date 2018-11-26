@@ -64,8 +64,6 @@ def getAverageAwayRanking(csvFileName):
 		return avgRanking
 def teamBacktoBack_bballreference(teamAbbr):
 	teamName = data.TEAM_ABBREVIATIONS_TO_TEAM[teamAbbr].value
-	print teamName
-	print teamAbbr
 	#check to see if a team is on a back-to-back, return True or False
 	for game in schedule_2019:
 		#print game
