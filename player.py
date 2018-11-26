@@ -206,7 +206,7 @@ def GetProjection(listOfPlayers,debugoutput=True,usenbaapi=False):
         
         player.projection = projectedPoints
 
-
+###TODO - rewrite this using https://www.basketball-reference.com/friv/last_n_days.fcgi?n=14
 def getLastTwoWeeksAveragePoints(playerObj):
     playerName = playerObj.name
     dateIndex = 1 #counter to keep track of how many days back we are going

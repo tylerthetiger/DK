@@ -5,6 +5,7 @@ from basketball_reference_web_scraper.parsers.box_scores import parse_player_box
 from basketball_reference_web_scraper.parsers.schedule import parse_schedule, parse_schedule_for_month_url_paths
 from basketball_reference_web_scraper.parsers.players_season_totals import parse_players_season_totals
 from basketball_reference_web_scraper.parsers.injury_report import parse_injury_report
+from basketball_reference_web_scraper.parsers.last_n_days import parse_last_n_days
 BASE_URL = 'https://www.basketball-reference.com'
 
 
@@ -13,7 +14,11 @@ def injury_report():
     response = requests.get(url=url, allow_redirects=False)
     if 200 <= response.status_code < 300:
         return parse_injury_report(response.content)
-
+def last_n_days(days):
+    url = '{BASE_URL}/friv/last_n_days.fcgi?n={DAYS}'.format(BASE_URL=BASE_URL,DAYS=days)
+    response = requests.get(url=url, allow_redirects=False)
+    if 200 <= response.status_code < 300:
+        return parse_last_n_days(response.content)
 def player_box_scores(day, month, year):
     url = '{BASE_URL}/friv/dailyleaders.cgi?month={month}&day={day}&year={year}'.format(
         BASE_URL=BASE_URL,
