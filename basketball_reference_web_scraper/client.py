@@ -7,8 +7,10 @@ from basketball_reference_web_scraper.json_encoders import BasketballReferenceJS
 
 def injury_report():
     return http_client.injury_report()
+
 def last_n_days(days):
     return http_client.last_n_days(days)
+    
 def player_box_scores(day, month, year, output_type=None, output_file_path=None, output_write_option=None, json_options=None):
     values = http_client.player_box_scores(day=day, month=month, year=year)
     return output(
@@ -47,3 +49,14 @@ def players_season_totals(season_end_year, output_type=None, output_file_path=No
         json_options=json_options,
     )
 
+def players_stats_per_100_poss(season_end_year, output_type=None, output_file_path=None, output_write_option=None, json_options=None):
+    values = http_client.players_season_totals(season_end_year)
+    return output(
+        values=values,
+        output_type=output_type,
+        output_file_path=output_file_path,
+        output_write_option=output_write_option,
+        csv_writer=players_season_totals_to_csv,
+        encoder=BasketballReferenceJSONEncoder,
+        json_options=json_options,
+    )
