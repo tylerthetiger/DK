@@ -35,10 +35,11 @@ def parse_player_100_poss(page):
     # across a season.
     rows = tree.xpath('//table[@id="per_poss_stats"]/tbody/tr[contains(@class, "full_table") or contains(@class, "italic_text partial_table") and not(contains(@class, "thead"))]')
     totals = []
-    # for row in rows:
+    for row in rows:
         # Basketball Reference includes a "total" row for players that got traded
         # which is essentially a sum of all player team rows
         # I want to avoid including those, so I check the "team" field value for "TOT"
         # if row[4].text_content() != "TOT":
         #     totals.append(parse_player_season_totals(row))
+        totals.append(parse_player_100_poss(row))
     return totals
