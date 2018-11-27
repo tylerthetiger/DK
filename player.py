@@ -181,7 +181,6 @@ def BackToBack(playerObj):
 
 # get list of injured players from https://www.basketball-reference.com/friv/injuries.fcgi
 # returns a list of names of players that are injured
-<<<<<<< HEAD
 def GetInjuries (csvFileName):
     injuredPlayers = []
     lineCount = 0
