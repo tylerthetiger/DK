@@ -2,7 +2,7 @@ from lxml import html
 
 from basketball_reference_web_scraper.data import TEAM_ABBREVIATIONS_TO_TEAM, POSITION_ABBREVIATIONS_TO_POSITION
 
-def parse_player_season_totals(row):
+def parse_player_100_poss(row):
     return {
         "name": str(row[1].text_content()),
         "position": POSITION_ABBREVIATIONS_TO_POSITION[row[2].text_content()],
@@ -28,7 +28,7 @@ def parse_player_season_totals(row):
         "defensive_rating":int(row[30].text_content()),
     }
 
-def parse_players_season_totals(page):
+def parse_player_100_poss(page):
     tree = html.fromstring(page)
     # Basketball Reference includes individual rows for players that played for multiple teams in a season
     # These rows have a separate class ("italic_text partial_table") than the players that played for a single team
