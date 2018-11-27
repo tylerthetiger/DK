@@ -3,7 +3,7 @@ import datetime
 from nba_api.stats.endpoints import commonplayerinfo, playerfantasyprofile,playergamelog
 from nba_api.stats.static import players
 from basketball_reference_web_scraper import client
-from player import writePlayerProjectsionToCSV, FantasyScoreFromSingleGame, GetEligiblePlayers,GetProjection
+from player import writePlayerProjectsionToCSV, FantasyScoreFromSingleGame, GetEligiblePlayers,GetProjection,GetProjection_bballreference
 import sys
 today=datetime.datetime.today().strftime('%m/%d/%Y')
 yesterday=(datetime.datetime.now() - datetime.timedelta(1)).strftime('%m/%d/%Y')
@@ -23,7 +23,7 @@ def main():
     eligibleList = GetEligiblePlayers(sys.argv[1], 'injuries.csv')
     print 'finished getting list of eligible players ({} players)'.format(str(len(eligibleList)))
     print 'getting player projections'
-    GetProjection(eligibleList,debugoutput=True,usenbaapi=False)
+    GetProjection_bballreference(eligibleList,debugoutput=True)
     print 'finished getting projections'
     writePlayerProjectsionToCSV('DKSalaries-projected.csv',eligibleList)
     print 'finished writing out projections to csv'

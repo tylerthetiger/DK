@@ -20,8 +20,9 @@ class Player:
         self.avgPoints = row[8]
         self.team = row[7] #this is the team that the player is on
         self.nextOpponent = getOpponent(row[6],self.team)
-        if self.nextOpponent == "NY":
-            self.nextOpponent = "NYK" #fix for draftkings/nba api compatibility
+        self.lastTwoWeekAverage = 0
+       # if self.nextOpponent == "NY": #removing this - fix in data.py should be good
+        #    self.nextOpponent = "NYK" #fix for draftkings/nba api compatibility
         self.nextGameLocation = getLocation(row[6],self.team)#should be home or away
         self.projection = 0
     def __repr__(self):
@@ -173,7 +174,21 @@ def GetInjuries (csvFileName):
                 nameOnly = rawName[0:findFullName]
                 injuredPlayers.append(nameOnly)
     return injuredPlayers
-
+##Not going to be able to use the last_n_days since that wont give us information on double double/triple doubles
+def GetProjection_bballreference(listOfPlayers,debugoutput=True):
+    lastTwoWeeks = client.last_n_days_playerlist(30) #this is goig to return a tuple of playerName, htmlLink
+    for player in listOfPlayers:
+        match = None
+        for l in lastTwoWeeks:
+            if l[0].lower() in player.name.lower() or player.name.lower() in l[0].lower():
+                match = l
+                break
+        if match == None:
+            print("Unable to find player match for{}".format(player.name))
+        else:
+            #grab the players individual season performance and score it
+            pass
+           # print "found player!{}".format(player.name)
 def GetProjection(listOfPlayers,debugoutput=True,usenbaapi=False):
     for player in listOfPlayers:
         if debugoutput:
