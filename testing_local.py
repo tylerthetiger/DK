@@ -25,10 +25,10 @@ def main():
     print 'getting player projections'
     GetProjection(eligibleList,debugoutput=True,usenbaapi=False)
     print 'finished getting projections'
-    writePlayerProjectsionToCSV('DKSalaries-projected.csv',eligibleList)
+    writePlayerProjectsionToCSV('DKSalaries-projected2.csv',eligibleList)
     print 'finished writing out projections to csv'
     print 'getting optimized lineup'
-    GetOptimizedLineup('DKSalaries-projected.csv')
+    GetOptimizedLineup('DKSalaries-projected2.csv')
 
     return None
 if __name__=="__main__":
