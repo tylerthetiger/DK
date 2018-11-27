@@ -20,7 +20,7 @@ def main():
     if (len(sys.argv)<2):
         print 'Usage python {} <csvTouse>'.format(sys.argv[0])
         sys.exit(0)
-    eligibleList = GetEligiblePlayers(sys.argv[1], 'injuries.csv')
+    eligibleList = GetEligiblePlayers(sys.argv[1])
     print 'finished getting list of eligible players ({} players)'.format(str(len(eligibleList)))
     print 'getting player projections'
     GetProjection(eligibleList,debugoutput=True,usenbaapi=False)

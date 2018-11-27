@@ -221,7 +221,7 @@ def GetProjection(listOfPlayers,debugoutput=True,usenbaapi=False):
         #TODO adjust based on team defensive ranking
         teamCity = teamMapping[opponentTeam]
         defenseRanking = getNextGameDefensiveRating('defensive_ranking.csv')
-        print defenseRanking
+        # print defenseRanking
         defenseOffset = defenseRanking[teamCity]
         projectedPoints = projectedPoints * defenseOffset
         
