@@ -86,6 +86,15 @@ def GetEligiblePlayers(csvOfAllPlayers):
 
     return finalList
 
+def getPlayerDefensiveRanking():
+    playerStats = client.players_stats_per_100_poss('2019')
+    test = []
+
+    for defensiveRating in playerStats:
+        test.append(defensiveRating['defensive_rating'])
+
+    return test
+
 def getBoxScoreForPlayerFromLists(playerName,BoxScoreList):
     for boxscore in BoxScoreList:
         #print boxscore['name']
@@ -331,6 +340,8 @@ def GetListOfPlayers(csvFileName):
     return listOfPlayers
 
 def main():
-    pass
+    testing = getPlayerDefensiveRanking()
+    print(testing)
+    # pass
 if __name__ == "__main__":
     main()

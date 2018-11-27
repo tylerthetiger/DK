@@ -87,4 +87,4 @@ def player_stats_per_100_poss(season_end_year):
 
     response.raise_for_status()
 
-    return parse_player_100_poss(response.content)
+    return parse_players_100_poss(response.content)
