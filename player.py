@@ -103,6 +103,7 @@ def getBoxScoreForPlayerFromLists(playerName,BoxScoreList):
         if playerName.lower() in boxscore['name'].lower() or boxscore['name'].lower() in playerName.lower():
             return boxscore
     return None
+    
 def FantasyScoreFromSingleGame(boxscore):
     try:
         freeThrowsMade = (boxscore['made_free_throws'])
