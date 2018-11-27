@@ -20,15 +20,15 @@ def main():
     if (len(sys.argv)<2):
         print 'Usage python {} <csvTouse>'.format(sys.argv[0])
         sys.exit(0)
-    eligibleList = GetEligiblePlayers(sys.argv[1], 'injuries.csv')
+    eligibleList = GetEligiblePlayers(sys.argv[1])
     print 'finished getting list of eligible players ({} players)'.format(str(len(eligibleList)))
     print 'getting player projections'
     GetProjection_bballreference(eligibleList,debugoutput=True)
     print 'finished getting projections'
-    writePlayerProjectsionToCSV('DKSalaries-projected.csv',eligibleList)
+    writePlayerProjectsionToCSV('DKSalaries-projected2.csv',eligibleList)
     print 'finished writing out projections to csv'
     print 'getting optimized lineup'
-    GetOptimizedLineup('DKSalaries-projected.csv')
+    GetOptimizedLineup('DKSalaries-projected2.csv')
 
     return None
 if __name__=="__main__":

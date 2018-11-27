@@ -57,9 +57,19 @@ def getOpponent(gameInfo,TeamAbbrev):
     else:
         return awayTeam
 
-def GetEligiblePlayers(csvOfAllPlayers, csvOfInjuredPlayers):
+# get data from web instead of csv
+def GetInjuriesv2():
+    injuries = client.injury_report()
+    injuredPlayers = []
+
+    for injuredPlayer in injuries:
+        injuredPlayers.append(injuredPlayer['player'])
+    
+    return injuredPlayers
+
+def GetEligiblePlayers(csvOfAllPlayers):
     allPlayers = GetListOfPlayers(csvOfAllPlayers)
-    injuredPlayers = GetInjuries(csvOfInjuredPlayers)
+    injuredPlayers = GetInjuriesv2()
     eligiblePlayers = []
     finalList = []
 
@@ -77,6 +87,16 @@ def GetEligiblePlayers(csvOfAllPlayers, csvOfInjuredPlayers):
 
     return finalList
 
+#TODO: get eligible players, calculate defensive ranking, assign to team
+def getPlayerDefensiveRanking():
+    playerStats = client.players_stats_per_100_poss('2019')
+    test = []
+
+    for defensiveRating in playerStats:
+        test.append(defensiveRating['defensive_rating'])
+
+    return test
+
 def getBoxScoreForPlayerFromLists(playerName,BoxScoreList):
     for boxscore in BoxScoreList:
         #print boxscore['name']
@@ -84,6 +104,7 @@ def getBoxScoreForPlayerFromLists(playerName,BoxScoreList):
         if playerName.lower() in boxscore['name'].lower() or boxscore['name'].lower() in playerName.lower():
             return boxscore
     return None
+    
 def FantasyScoreFromSingleGame(boxscore):
     try:
         freeThrowsMade = (boxscore['made_free_throws'])
@@ -160,6 +181,7 @@ def BackToBack(playerObj):
 
 # get list of injured players from https://www.basketball-reference.com/friv/injuries.fcgi
 # returns a list of names of players that are injured
+<<<<<<< HEAD
 def GetInjuries (csvFileName):
     injuredPlayers = []
     lineCount = 0
@@ -189,6 +211,22 @@ def GetProjection_bballreference(listOfPlayers,debugoutput=True):
             #grab the players individual season performance and score it
             pass
            # print "found player!{}".format(player.name)
+
+# def GetInjuries (csvFileName):
+#     injuredPlayers = []
+#     lineCount = 0
+#     with open(csvFileName) as csv_file:
+#         csv_reader = csv.reader(csv_file, delimiter=',')
+#         for row in csv_reader:
+#             if lineCount == 0:
+#                 lineCount += 1
+#             else:
+#                 rawName = row[0]
+#                 findFullName = rawName.find("\\")
+#                 nameOnly = rawName[0:findFullName]
+#                 injuredPlayers.append(nameOnly)
+#     return injuredPlayers
+
 def GetProjection(listOfPlayers,debugoutput=True,usenbaapi=False):
     for player in listOfPlayers:
         if debugoutput:
@@ -215,7 +253,7 @@ def GetProjection(listOfPlayers,debugoutput=True,usenbaapi=False):
         #TODO adjust based on team defensive ranking
         teamCity = teamMapping[opponentTeam]
         defenseRanking = getNextGameDefensiveRating('defensive_ranking.csv')
-        print defenseRanking
+        # print defenseRanking
         defenseOffset = defenseRanking[teamCity]
         projectedPoints = projectedPoints * defenseOffset
         
@@ -336,6 +374,8 @@ def GetListOfPlayers(csvFileName):
     return listOfPlayers
 
 def main():
-    pass
+    testing = getPlayerDefensiveRanking()
+    print(testing)
+    # pass
 if __name__ == "__main__":
     main()

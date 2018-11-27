@@ -6,6 +6,7 @@ from basketball_reference_web_scraper.parsers.schedule import parse_schedule, pa
 from basketball_reference_web_scraper.parsers.players_season_totals import parse_players_season_totals
 from basketball_reference_web_scraper.parsers.injury_report import parse_injury_report
 from basketball_reference_web_scraper.parsers.last_n_days import parse_last_n_days_playerlist
+from basketball_reference_web_scraper.parsers.player_stats_per_100_poss import *
 BASE_URL = 'https://www.basketball-reference.com'
 
 
@@ -75,3 +76,15 @@ def players_season_totals(season_end_year):
     response.raise_for_status()
 
     return parse_players_season_totals(response.content)
+
+def player_stats_per_100_poss(season_end_year):
+    url = '{BASE_URL}/leagues/NBA_{season_end_year}_per_poss.html'.format(
+        BASE_URL=BASE_URL,
+        season_end_year=season_end_year,
+    )
+
+    response = requests.get(url=url)
+
+    response.raise_for_status()
+
+    return parse_players_100_poss(response.content)
