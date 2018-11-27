@@ -3,7 +3,13 @@ from lxml import html
 from basketball_reference_web_scraper.data import TEAM_ABBREVIATIONS_TO_TEAM, POSITION_ABBREVIATIONS_TO_POSITION
 
 def parse_player_100_poss(row):
-    return {
+
+	if row[30].text_content() == " " or row[30].text_content() == "":
+		defense_ranking = 0
+	else:
+		defense_ranking = int(row[30].text_content())
+
+	return {
         "name": str(row[1].text_content()),
         "position": POSITION_ABBREVIATIONS_TO_POSITION[row[2].text_content()],
         "age": int(row[3].text_content()),
@@ -24,9 +30,9 @@ def parse_player_100_poss(row):
         "blocks": float(row[25].text_content()),
         "turnovers": float(row[26].text_content()),
         "personal_fouls": float(row[27].text_content()),
+        #TODO: account for nulls similar to defensive ranking
         # "offensive_rating":float(row[29].text_content()),
-        # TODO: need to make this an int (will error currently bc of null values)
-        "defensive_rating":str(row[30].text_content()),
+        "defensive_rating":defense_ranking,
     }
 
 def parse_players_100_poss(page):
