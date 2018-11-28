@@ -20,6 +20,9 @@ class Player:
         self.team = row[7] #this is the team that the player is on
         self.nextOpponent = getOpponent(row[6],self.team)
         self.lastTwoWeekAverage = 0
+        self.lastTwoWeekAverageHome = 0
+        self.lastTwoWeekAverageAway = 0
+
        # if self.nextOpponent == "NY": #removing this - fix in data.py should be good
         #    self.nextOpponent = "NYK" #fix for draftkings/nba api compatibility
         self.nextGameLocation = getLocation(row[6],self.team)#should be home or away
@@ -227,12 +230,19 @@ def BasketballReferenceScoreSingleGame(boxscore):
     pointTotal+=(turnovers*-0.5)
     return pointTotal
 #score a game list and return the average fantasy points per game
-def BasketballReferenceScoreGameList(gameList):
+def BasketballReferenceScoreGameList(gameList,numberOfGames,location):
     total = float(0)
     games=0
-    for game in gameList:
+    revGames=gameList[::-1]#get most recent games!
+    for game in revGames:
+        if game['location']!=location:
+            pass
         games+=1
         total+=BasketballReferenceScoreSingleGame(game)
+        if games>=numberOfGames:
+            break#stop looking at games once we've scored enough
+    #if numberOfGames>games:
+     #   raise Exception("Couldn't get enough games.  Needed {} got {} at location {}".format(numberOfGames,games,location))
     return float(total)/float(games) #you'll all float down here
 def BasketballReferenceScorePlayer(bballrefHTML,NumberOfDays,playerObj):
     print "starting to score for player {}".format(playerObj.name)
@@ -240,14 +250,14 @@ def BasketballReferenceScorePlayer(bballrefHTML,NumberOfDays,playerObj):
     bballrefHTML = bballrefHTML[0:bballrefHTML.find(".")] #strip off the .html
     finalURL = BASE_URL+bballrefHTML+'/gamelog/2019'
     playerLog= client.player_season_log(finalURL)
-    playerFantasyAverage = BasketballReferenceScoreGameList(playerLog)
+    playerFantasyAverage = BasketballReferenceScoreGameList(playerLog,NumberOfDays,playerObj.nextGameLocation)
     playerObj.lastTwoWeekAverage = playerFantasyAverage
     print "Just scored player {} average:{}".format(playerObj.name,playerFantasyAverage)
     #player2019gamelog = BASE_URL + ''
 ## For every elgible player, calculate a projection, based on the last NumberOfDays
-def GetProjection_bballreference(listOfPlayers,NumberOfDays=30,debugoutput=True):
-    
-    lastTwoWeeks = client.last_n_days_playerlist(NumberOfDays) #this is goig to return a tuple of playerName, htmlLink
+def GetProjection_bballreference(listOfPlayers,NumberOfGames=30,debugoutput=True):
+                                        #we retrieve 45 days worth of data, but we'll only examine the last 14 games
+    lastTwoWeeks = client.last_n_days_playerlist(45) #this is goig to return a tuple of playerName, htmlLink
     for player in listOfPlayers:
         match = None
         for l in lastTwoWeeks:
@@ -257,10 +267,10 @@ def GetProjection_bballreference(listOfPlayers,NumberOfDays=30,debugoutput=True)
         if match == None:
             print("Unable to find player match for{}".format(player.name))
         else:
-            BasketballReferenceScorePlayer(l[1],NumberOfDays,player)#l[1] iis the html link
+            BasketballReferenceScorePlayer(l[1],NumberOfGames,player)#l[1] iis the html link
             #grab the players individual season performance and score it
             #this will fill in the player.lastTwoWeekAverage 
-            GetPlayerProjection(player)
+            GetPlayerProjection(player,debugoutput=True)
            # print "found player!{}".format(player.name)
 def GetPlayerProjection(player,debugoutput=True):
         lastTwoWeekAverage = projectedPoints = player.lastTwoWeekAverage#baseline projected points
@@ -275,13 +285,6 @@ def GetPlayerProjection(player,debugoutput=True):
             if debugoutput:
                 print 'decreasing player projection due to back2back'
             projectedPoints = projectedPoints - (0.10 * lastTwoWeekAverage)
-    
-        if player.nextGameLocation == "Home":
-            if debugoutput:
-                print 'raising player projection due to being at home'
-        if player.nextGameLocation!="Home" and player.nextGameLocation!="Away":
-            raise Exception("player.nextgamelocation not set correctly!")
-            projectedPoints = projectedPoints + (lastTwoWeekAverage * 0.10)
         teamCity = teamMapping[opponentTeam]
         defenseRanking = getNextGameDefensiveRating('defensive_ranking.csv')
         # print defenseRanking
