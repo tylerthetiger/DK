@@ -23,8 +23,8 @@ class Player:
         self.lastTwoWeekAverageHome = 0
         self.lastTwoWeekAverageAway = 0
 
-       # if self.nextOpponent == "NY": #removing this - fix in data.py should be good
-        #    self.nextOpponent = "NYK" #fix for draftkings/nba api compatibility
+        if self.nextOpponent == "NY": #removing this - fix in data.py should be good
+            self.nextOpponent = "NYK" #fix for draftkings/nba api compatibility
         self.nextGameLocation = getLocation(row[6],self.team)#should be home or away
         self.projection = 0
     def __repr__(self):
