@@ -3,7 +3,7 @@ import datetime
 from nba_api.stats.endpoints import commonplayerinfo, playerfantasyprofile,playergamelog
 from nba_api.stats.static import players
 from basketball_reference_web_scraper import client
-from player import writePlayerProjectsionToCSV, FantasyScoreFromSingleGame, GetEligiblePlayers,GetProjection,GetProjection_bballreference
+from player import writePlayerProjectsionToCSV, FantasyScoreFromSingleGame, GetEligiblePlayers,GetProjection_bballreference
 import sys
 today=datetime.datetime.today().strftime('%m/%d/%Y')
 yesterday=(datetime.datetime.now() - datetime.timedelta(1)).strftime('%m/%d/%Y')

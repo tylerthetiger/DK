@@ -10,7 +10,6 @@ class Player:
         #name,NBAplayerID,position,avgPoints,salary,team,nextOpponent,nextGameLocation
         self.position=row[0]
         self.nameplusid=row[1]
-        # account for misspelled names
         self.name = row[2]
         self.NBAplayerID = row[3]
         self.rosterposition = row[4]
@@ -262,21 +261,33 @@ def GetProjection_bballreference(listOfPlayers,NumberOfDays=30,debugoutput=True)
             #grab the players individual season performance and score it
             #this will fill in the player.lastTwoWeekAverage 
             GetPlayerProjection(player)
-            pass
            # print "found player!{}".format(player.name)
 def GetPlayerProjection(player,debugoutput=True):
         lastTwoWeekAverage = projectedPoints = player.lastTwoWeekAverage#baseline projected points
         opponentTeam = player.nextOpponent
         opponentIsBackToBack = teamBacktoBack_bballreference(opponentTeam)
         if opponentIsBackToBack:
+            if debugoutput:
+                print 'increasing player projection due to opponent on back2back'
             projectedPoints = projectedPoints + (0.10 * lastTwoWeekAverage)
-        if debugoutput:
-            print 'done getting team back to back, getting team defensive rating'
-        #TODO adjust based on team defensive ranking
+        playerIsBackToBack = BackToBack(player)
+        if playerIsBackToBack:
+            if debugoutput:
+                print 'decreasing player projection due to back2back'
+            projectedPoints = projectedPoints - (0.10 * lastTwoWeekAverage)
+    
+        if player.nextGameLocation == "Home":
+            if debugoutput:
+                print 'raising player projection due to being at home'
+        if player.nextGameLocation!="Home" and player.nextGameLocation!="Away":
+            raise Exception("player.nextgamelocation not set correctly!")
+            projectedPoints = projectedPoints + (lastTwoWeekAverage * 0.10)
         teamCity = teamMapping[opponentTeam]
         defenseRanking = getNextGameDefensiveRating('defensive_ranking.csv')
         # print defenseRanking
         defenseOffset = defenseRanking[teamCity]
+        if debugoutput:
+            print 'adjusting player by ' + str(defenseOffset) + ' for defensive offset'
         projectedPoints = projectedPoints * defenseOffset
         
         player.projection = projectedPoints
@@ -295,38 +306,38 @@ def GetPlayerProjection(player,debugoutput=True):
 #                 injuredPlayers.append(nameOnly)
 #     return injuredPlayers
 
-def GetProjection(listOfPlayers,debugoutput=True,usenbaapi=False):
-    for player in listOfPlayers:
-        if debugoutput:
-            print 'getting projection for {}'.format(player.name)
-        if usenbaapi==True:
-            lastTwoWeekAverage = projectedPoints = getLastTwoWeeksAveragePoints_nbaapi(player)#baseline projected points
-        else:
-            lastTwoWeekAverage = projectedPoints = getLastTwoWeeksAveragePoints(player)#baseline projected points
-        if debugoutput:
-            print 'done getting 2 week average, getting back to back' + str(lastTwoWeekAverage)
-        playerIsBackToBack = BackToBack(player)
+# def GetProjection(listOfPlayers,debugoutput=True,usenbaapi=False):
+#     for player in listOfPlayers:
+#         if debugoutput:
+#             print 'getting projection for {}'.format(player.name)
+#         if usenbaapi==True:
+#             lastTwoWeekAverage = projectedPoints = getLastTwoWeeksAveragePoints_nbaapi(player)#baseline projected points
+#         else:
+#             lastTwoWeekAverage = projectedPoints = getLastTwoWeeksAveragePoints(player)#baseline projected points
+#         if debugoutput:
+#             print 'done getting 2 week average, getting back to back' + str(lastTwoWeekAverage)
+#         playerIsBackToBack = BackToBack(player)
 
-        if playerIsBackToBack:
-            projectedPoints = projectedPoints - (0.10 * lastTwoWeekAverage)
-        if debugoutput:
-            print 'done getting player back to back, getting team back to back'
+#         if playerIsBackToBack:
+#             projectedPoints = projectedPoints - (0.10 * lastTwoWeekAverage)
+#         if debugoutput:
+#             print 'done getting player back to back, getting team back to back'
         
-        opponentTeam = player.nextOpponent
-        opponentIsBackToBack = teamBacktoBack_bballreference(opponentTeam)
-        if opponentIsBackToBack:
-            projectedPoints = projectedPoints + (0.10 * lastTwoWeekAverage)
-        if debugoutput:
-            print 'done getting team back to back, getting team defensive rating'
-        #TODO adjust based on team defensive ranking
-        teamCity = teamMapping[opponentTeam]
-        defenseRanking = getNextGameDefensiveRating('defensive_ranking.csv')
-        print defenseRanking
-        # print defenseRanking
-        defenseOffset = defenseRanking[teamCity]
-        projectedPoints = projectedPoints * defenseOffset
+#         opponentTeam = player.nextOpponent
+#         opponentIsBackToBack = teamBacktoBack_bballreference(opponentTeam)
+#         if opponentIsBackToBack:
+#             projectedPoints = projectedPoints + (0.10 * lastTwoWeekAverage)
+#         if debugoutput:
+#             print 'done getting team back to back, getting team defensive rating'
+#         #TODO adjust based on team defensive ranking
+#         teamCity = teamMapping[opponentTeam]
+#         defenseRanking = getNextGameDefensiveRating('defensive_ranking.csv')
+#         print defenseRanking
+#         # print defenseRanking
+#         defenseOffset = defenseRanking[teamCity]
+#         projectedPoints = projectedPoints * defenseOffset
         
-        player.projection = projectedPoints
+#         player.projection = projectedPoints
 
 ###TODO - rewrite this using https://www.basketball-reference.com/friv/last_n_days.fcgi?n=14
 def getLastTwoWeeksAveragePoints(playerObj):
