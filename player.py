@@ -287,7 +287,7 @@ def GetPlayerProjection(player,debugoutput=True):
             projectedPoints = projectedPoints - (0.10 * lastTwoWeekAverage)
         teamCity = teamMapping[opponentTeam]
         defenseRanking = getNextGameDefensiveRating('defensive_ranking.csv')
-        # print defenseRanking
+        print defenseRanking
         defenseOffset = defenseRanking[teamCity]
         if debugoutput:
             print 'adjusting player by ' + str(defenseOffset) + ' for defensive offset'
