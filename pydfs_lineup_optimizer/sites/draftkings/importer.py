@@ -26,6 +26,7 @@ class DraftKingsCSVImporter(CSVImporter):
                         row['TeamAbbrev'],
                         float(row['Salary']),
                         float(row['AvgPointsPerGame']),
+                        float(row['estimatedPoints']),
                         max_exposure=float(max_exposure.replace('%', '')) if max_exposure else None
                     )
                 except KeyError:

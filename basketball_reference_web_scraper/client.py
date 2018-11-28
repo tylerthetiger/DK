@@ -23,6 +23,8 @@ def player_box_scores(day, month, year, output_type=None, output_file_path=None,
         json_options=json_options,
     )
 
+def player_season_log(url):
+    return http_client.player_season_log(url)
 
 def season_schedule(season_end_year, output_type=None, output_file_path=None, output_write_option=None, json_options=None):
     values = http_client.season_schedule(season_end_year)

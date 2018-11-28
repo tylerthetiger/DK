@@ -6,10 +6,18 @@ from basketball_reference_web_scraper.parsers.schedule import parse_schedule, pa
 from basketball_reference_web_scraper.parsers.players_season_totals import parse_players_season_totals
 from basketball_reference_web_scraper.parsers.injury_report import parse_injury_report
 from basketball_reference_web_scraper.parsers.last_n_days import parse_last_n_days_playerlist
+from basketball_reference_web_scraper.parsers.player_season_gamelog import parse_player_season
+
 from basketball_reference_web_scraper.parsers.player_stats_per_100_poss import *
+
 BASE_URL = 'https://www.basketball-reference.com'
 
-
+def player_season_log(url):
+    response = requests.get(url=url, allow_redirects=False)
+    if 200 <= response.status_code < 300:
+        return parse_player_season(response.content)
+    else:
+        raise Exception("unable to parse url{}".format(url))
 def injury_report():
     url = '{BASE_URL}/friv/injuries.fcgi'.format(BASE_URL=BASE_URL)
     response = requests.get(url=url, allow_redirects=False)

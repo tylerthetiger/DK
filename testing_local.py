@@ -23,7 +23,8 @@ def main():
     eligibleList = GetEligiblePlayers(sys.argv[1])
     print 'finished getting list of eligible players ({} players)'.format(str(len(eligibleList)))
     print 'getting player projections'
-    GetProjection_bballreference(eligibleList,debugoutput=True)
+    GetProjection_bballreference(eligibleList,debugoutput=True,NumberOfDays=30)#number of days is the number of previous days to look at to get average
+    #GetProjection(eligibleList,debugoutput=True)
     print 'finished getting projections'
     writePlayerProjectsionToCSV('DKSalaries-projected2.csv',eligibleList)
     print 'finished writing out projections to csv'

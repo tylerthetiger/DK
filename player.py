@@ -35,9 +35,9 @@ class Player:
 
 def writePlayerProjectsionToCSV(csvFileName,playerObjList):
     with open(csvFileName,'w') as csv_file:
-        csv_file.write("Position,Name + ID,Name,ID,Roster Position,Salary,Game Info,TeamAbbrev,AvgPointsPerGame\n")
+        csv_file.write("Position,Name + ID,Name,ID,Roster Position,Salary,Game Info,TeamAbbrev,AvgPointsPerGame,estimatedPoints\n")
         for player in playerObjList:
-            outputString = "{},{},{},{},{},{},{},{},{}\n".format(player.position,player.nameplusid,player.name,player.NBAplayerID,player.rosterposition,str(player.salary),player.gameinfo,player.teamabbrev,str(player.projection))
+            outputString = "{},{},{},{},{},{},{},{},{},{}\n".format(player.position,player.nameplusid,player.name,player.NBAplayerID,player.rosterposition,str(player.salary),player.gameinfo,player.teamabbrev,str(player.avgPoints),str(player.projection))
             csv_file.write(outputString)
 
 def getLocation(gameInfo,teamAbbrev):
@@ -195,9 +195,60 @@ def GetInjuries (csvFileName):
                 nameOnly = rawName[0:findFullName]
                 injuredPlayers.append(nameOnly)
     return injuredPlayers
-##Not going to be able to use the last_n_days since that wont give us information on double double/triple doubles
-def GetProjection_bballreference(listOfPlayers,debugoutput=True):
-    lastTwoWeeks = client.last_n_days_playerlist(30) #this is goig to return a tuple of playerName, htmlLink
+def BasketballReferenceScoreSingleGame(boxscore):
+    pointTotal=float(0)
+    points=boxscore['pts']
+    threepointers=boxscore['3p']
+    rebounds=boxscore['trb']
+    assists=boxscore['ast']
+    steals=boxscore['stl']
+    blocks=boxscore['blk']
+    turnovers=boxscore['tov']
+    numberDoubleCategories=0
+    if points>=10:
+        numberDoubleCategories+=1
+    if rebounds>=10:
+        numberDoubleCategories+=1
+    if assists>=10:
+        numberDoubleCategories+=1
+    if blocks>=10:
+        numberDoubleCategories+=1
+    if steals>=10:
+        numberDoubleCategories+=1
+    if numberDoubleCategories>=2:
+        pointTotal+=1.5
+    if numberDoubleCategories>=3:
+        pointTotal+=3
+    pointTotal+=points
+    pointTotal+=(threepointers*0.5)
+    pointTotal+=(rebounds*1.25)
+    pointTotal+=(assists*1.5)
+    pointTotal+=(steals*2)
+    pointTotal+=(blocks*2)
+    pointTotal+=(turnovers*-0.5)
+    return pointTotal
+#score a game list and return the average fantasy points per game
+def BasketballReferenceScoreGameList(gameList):
+    total = float(0)
+    games=0
+    for game in gameList:
+        games+=1
+        total+=BasketballReferenceScoreSingleGame(game)
+    return float(total)/float(games) #you'll all float down here
+def BasketballReferenceScorePlayer(bballrefHTML,NumberOfDays,playerObj):
+    print "starting to score for player {}".format(playerObj.name)
+    BASE_URL = 'https://www.basketball-reference.com'
+    bballrefHTML = bballrefHTML[0:bballrefHTML.find(".")] #strip off the .html
+    finalURL = BASE_URL+bballrefHTML+'/gamelog/2019'
+    playerLog= client.player_season_log(finalURL)
+    playerFantasyAverage = BasketballReferenceScoreGameList(playerLog)
+    playerObj.lastTwoWeekAverage = playerFantasyAverage
+    print "Just scored player {} average:{}".format(playerObj.name,playerFantasyAverage)
+    #player2019gamelog = BASE_URL + ''
+## For every elgible player, calculate a projection, based on the last NumberOfDays
+def GetProjection_bballreference(listOfPlayers,NumberOfDays=30,debugoutput=True):
+    
+    lastTwoWeeks = client.last_n_days_playerlist(NumberOfDays) #this is goig to return a tuple of playerName, htmlLink
     for player in listOfPlayers:
         match = None
         for l in lastTwoWeeks:
@@ -207,10 +258,28 @@ def GetProjection_bballreference(listOfPlayers,debugoutput=True):
         if match == None:
             print("Unable to find player match for{}".format(player.name))
         else:
+            BasketballReferenceScorePlayer(l[1],NumberOfDays,player)#l[1] iis the html link
             #grab the players individual season performance and score it
+            #this will fill in the player.lastTwoWeekAverage 
+            GetPlayerProjection(player)
             pass
            # print "found player!{}".format(player.name)
-
+def GetPlayerProjection(player,debugoutput=True):
+        lastTwoWeekAverage = projectedPoints = player.lastTwoWeekAverage#baseline projected points
+        opponentTeam = player.nextOpponent
+        opponentIsBackToBack = teamBacktoBack_bballreference(opponentTeam)
+        if opponentIsBackToBack:
+            projectedPoints = projectedPoints + (0.10 * lastTwoWeekAverage)
+        if debugoutput:
+            print 'done getting team back to back, getting team defensive rating'
+        #TODO adjust based on team defensive ranking
+        teamCity = teamMapping[opponentTeam]
+        defenseRanking = getNextGameDefensiveRating('defensive_ranking.csv')
+        # print defenseRanking
+        defenseOffset = defenseRanking[teamCity]
+        projectedPoints = projectedPoints * defenseOffset
+        
+        player.projection = projectedPoints
 # def GetInjuries (csvFileName):
 #     injuredPlayers = []
 #     lineCount = 0
@@ -252,6 +321,7 @@ def GetProjection(listOfPlayers,debugoutput=True,usenbaapi=False):
         #TODO adjust based on team defensive ranking
         teamCity = teamMapping[opponentTeam]
         defenseRanking = getNextGameDefensiveRating('defensive_ranking.csv')
+        print defenseRanking
         # print defenseRanking
         defenseOffset = defenseRanking[teamCity]
         projectedPoints = projectedPoints * defenseOffset

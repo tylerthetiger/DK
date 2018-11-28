@@ -3,8 +3,8 @@ from typing import List, Optional
 
 
 class Player(object):
-    def __init__(self, player_id,  first_name, last_name, positions, team, salary, fppg, is_injured=False,
-                 max_exposure=None, projected_ownership=None, estimatedPoints=None):
+    def __init__(self, player_id,  first_name, last_name, positions, team, salary, fppg,estimatedPoints, is_injured=False,
+                 max_exposure=None, projected_ownership=None):
         # type: (int, str, str, List[str], str, float, float, bool, Optional[float], Optional[float]) -> None
         self.id = player_id
         self.first_name = first_name
