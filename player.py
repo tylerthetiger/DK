@@ -20,8 +20,8 @@ class Player:
         self.team = row[7] #this is the team that the player is on
         self.nextOpponent = getOpponent(row[6],self.team)
         self.lastTwoWeekAverage = 0
-        self.lastTwoWeekAverageHome = 0
-        self.lastTwoWeekAverageAway = 0
+       # self.lastTwoWeekAverageHome = 0
+       # self.lastTwoWeekAverageAway = 0
 
         if self.nextOpponent == "NY": #removing this - fix in data.py should be good
             self.nextOpponent = "NYK" #fix for draftkings/nba api compatibility
@@ -39,7 +39,7 @@ def writePlayerProjectsionToCSV(csvFileName,playerObjList):
     with open(csvFileName,'w') as csv_file:
         csv_file.write("Position,Name + ID,Name,ID,Roster Position,Salary,Game Info,TeamAbbrev,AvgPointsPerGame,estimatedPoints\n")
         for player in playerObjList:
-            outputString = "{},{},{},{},{},{},{},{},{},{}\n".format(player.position,player.nameplusid,player.name,player.NBAplayerID,player.rosterposition,str(player.salary),player.gameinfo,player.teamabbrev,str(player.avgPoints),str(player.projection))
+            outputString = "{},{},{},{},{},{},{},{},{},{}\n".format(player.position,player.nameplusid,player.name,player.NBAplayerID,player.rosterposition,str(player.salary),player.gameinfo,player.teamabbrev,str(player.lastTwoWeekAverage),str(player.projection))
             csv_file.write(outputString)
 
 def getLocation(gameInfo,teamAbbrev):
