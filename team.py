@@ -1,9 +1,11 @@
 import csv
 import datetime
 import time
+from player import * 
 from nba_api.stats.endpoints import commonplayerinfo, playerfantasyprofile, playergamelog, teamgamelog, leaguegamelog
 from nba_api.stats.static import players, teams
 from basketball_reference_web_scraper import client,data #needed for team abbrevation mapping
+
 # create a dicionary mapping city abbr to city name for defensive rankings
 teamMapping = dict()
 
@@ -66,66 +68,126 @@ def getAverageAwayRanking(csvFileName):
 	else:
 		avgRanking = totalValue/numTeams
 		return avgRanking
+
 def teamBacktoBack_bballreference(teamAbbr):
 	teamName = data.TEAM_ABBREVIATIONS_TO_TEAM[teamAbbr].value
 	#check to see if a team is on a back-to-back, return True or False
 	for game in schedule_2019:
-		#print game
 		gameStartTime = game['start_time']
 		if game['home_team'].value == teamName or game['away_team'].value == teamName:
 			if gameStartTime.year == yesterday.year and gameStartTime.month == yesterday.month and gameStartTime.day == yesterday.day:
 				print game
 				return True
 	return False
-def teamBacktoBack(teamAbbr):
-	nba_team = teams.find_team_by_abbreviation(teamAbbr)
-	print(teamAbbr)
-	teamId = nba_team['id']
 
-	date=(datetime.datetime.now() - datetime.timedelta(1)).strftime('%m/%d/%Y')
+# def teamBacktoBack(teamAbbr):
+# 	nba_team = teams.find_team_by_abbreviation(teamAbbr)
+# 	print(teamAbbr)
+# 	teamId = nba_team['id']
+
+# 	date=(datetime.datetime.now() - datetime.timedelta(1)).strftime('%m/%d/%Y')
 	# date = '11/23/2018'
-	season = '2018-19'
-	seasonType = 'Regular Season'
-	attempts=0
-	while attempts<5:
-		try:
-			gamelog = teamgamelog.TeamGameLog(season_all=season,season_type_all_star=seasonType,team_id=teamId,date_to_nullable=date,date_from_nullable=date)
-			break
-		except:
-			print 'nba api timed out, waiting 10 minutes then trying again.  (Attempt {} of 5'.format(attempts)
-			attempts+=1
-			time.sleep(600)
-	gameLogDf=gamelog.get_data_frames()[0]
-	entry = len(gameLogDf)
-	if entry == 1:
-		return True
-	else:
-		return False
+# 	season = '2018-19'
+# 	seasonType = 'Regular Season'
+# 	attempts=0
+# 	while attempts<5:
+# 		try:
+# 			gamelog = teamgamelog.TeamGameLog(season_all=season,season_type_all_star=seasonType,team_id=teamId,date_to_nullable=date,date_from_nullable=date)
+# 			break
+# 		except:
+# 			print 'nba api timed out, waiting 10 minutes then trying again.  (Attempt {} of 5'.format(attempts)
+# 			attempts+=1
+# 			time.sleep(600)
+# 	gameLogDf=gamelog.get_data_frames()[0]
+# 	entry = len(gameLogDf)
+# 	if entry == 1:
+# 		return True
+# 	else:
+# 		return False
 	# print(entry)
+
+#TODO: get eligible players, calculate defensive ranking, assign to team
+# we could make this more efficient by only getting defensive ratings of teams that are playing...this returns all
+def getPlayerDefensiveRanking():
+	playerStats = client.players_stats_per_100_poss('2019')
+	injuredPlayers = GetInjuriesv2()
+	eligiblePlayers = []
+	finalList = []
+
+	for allPlayers in playerStats:
+		eligiblePlayers.append(allPlayers['name'])
+
+	for eligible in eligiblePlayers:
+		playerIsInjured=False
+		for injured in injuredPlayers:
+			if injured in eligible:
+				playerIsInjured=True
+          
+		if playerIsInjured==False:
+			finalList.append(eligible)
+
+	team_defense = dict()
+	team_defense_all = dict()
+
+	allPlayerDefense = 0
+	allPlayers = 0
+
+	for testdefensiveRating in playerStats:
+		allPlayers += 1
+		if testdefensiveRating['team_abbr'] in team_defense_all:
+			team = testdefensiveRating['team_abbr']
+			player_defensive_rating = testdefensiveRating['defensive_rating']#the individual players rating
+			(prev_defensive_avg,defensiverating_total,players) = team_defense_all[team]
+			new_team_def_rating_avg = (defensiverating_total+player_defensive_rating)/(players+1)
+			team_defense_all[team] = (new_team_def_rating_avg,defensiverating_total+player_defensive_rating,players+1)
+		else:
+			team = testdefensiveRating['team_abbr']
+			print 'creating new entry for ' + str(team)
+			defensive_rating = testdefensiveRating['defensive_rating']
+			team_defense_all[team] = (defensive_rating,defensive_rating,1)
+	# print team_defense_all
+	# print len(playerStats)
+	countEligible = 0
+
+	for defensiveRating in playerStats:
+		countEligible += 1
+		if defensiveRating['name'] in finalList:
+			# team already exists and need to take avg of all players defensive rankings
+			if defensiveRating['team_abbr'] in team_defense:
+				#find the team in the list
+				team = defensiveRating['team_abbr']
+				#get defensive rating of this one player record
+				player_defensive_rating = defensiveRating['defensive_rating']#the individual players rating
+				#keep track of new and old rating for testing purposes
+				(prev_defensive_avg,defensiverating_total,players) = team_defense[team]
+				#set new ranking based on new player rating
+				new_team_def_rating_avg = (defensiverating_total+player_defensive_rating)/(players+1)
+				team_defense[team] = (new_team_def_rating_avg,defensiverating_total+player_defensive_rating,players+1)
+			else:
+				# if team doesnt exist in list, create it
+				team = defensiveRating['team_abbr']
+				print 'creating new entry for ' + str(team)
+				# set defensive rating for team based on first player identified
+				defensive_rating = defensiveRating['defensive_rating']
+				# create a tuple for the dictionary
+				team_defense[team] = (defensive_rating,defensive_rating,1)
+		else:
+			pass
+
+	# TODO assign defensive rating to team object
+	# return team_defense, team_defense_all
+
+	print('all defensive ratings are: ')
+	print(team_defense_all)
+	print('eligible defensive ratings are: ')
+	print(team_defense)
 
 class Team:
 	def __init__(self,row):
 		self.name = row[1]
 		self.homeRanking = row[5]
 		self.awayRanking = row[6]
-		self.nextGameDefensiveRating = -1 #this is the normalized defensive ranking for this team
-		# lineCount=0
-		# foundTeam = False
-		# with open('defensive_ranking.csv') as csv_file:
-		# 	csv_reader = csv.reader(csv_file, delimiter='\t')
-		# 	for row in csv_reader:
-		# 		if lineCount == 0:
-		# 			lineCount+=1 #skip the header
-		# 		else:
-		# 			if row[1] == teamMapping[row[1]]:
-		# 				#matched the team we are looking for
-		# 				foundTeam = True
-		# 				self.homeRanking = row[5]
-		# 				self.awayRanking = row[6]
-
-		# if foundTeam == False:
-		# 	print 'couldnt find team'
-		# 	raise Exception
+		self.nextGameDefensiveRating = -1 
 
 	def __repr__(self):
 		return 'Team({},{},{},{})'.format(self.name,self.homeRanking,self.awayRanking,self.nextGameDefensiveRating)
@@ -207,10 +269,11 @@ def getNextGameDefensiveRating(csvFileName):
 			else:
 				pass
 	return teamOffset
-		# print(teamobj)
 
 def main():
-	print teamBacktoBack_bballreference('DEN')
+	test = getPlayerDefensiveRanking()
+	print(test)
+	# print teamBacktoBack_bballreference('DEN')
 	# awayRank = getAverageAwayRanking('defensive_ranking.csv')
 	# print(awayRank)
 	# team = teamBacktoBack('DEN')

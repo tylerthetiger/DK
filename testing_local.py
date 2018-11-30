@@ -26,10 +26,10 @@ def main():
     GetProjection_bballreference(eligibleList,debugoutput=True,NumberOfGames=10)#number of days is the number of previous days to look at to get average
     #GetProjection(eligibleList,debugoutput=True)
     print 'finished getting projections'
-    writePlayerProjectsionToCSV('DKSalaries-projected2.csv',eligibleList)
+    writePlayerProjectsionToCSV('DKSalaries-projected1.csv',eligibleList)
     print 'finished writing out projections to csv'
     print 'getting optimized lineup'
-    GetOptimizedLineup('DKSalaries-projected2.csv')
+    GetOptimizedLineup('DKSalaries-projected1.csv')
 
     return None
 if __name__=="__main__":

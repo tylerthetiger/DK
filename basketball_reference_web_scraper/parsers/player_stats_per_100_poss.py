@@ -4,16 +4,17 @@ from basketball_reference_web_scraper.data import TEAM_ABBREVIATIONS_TO_TEAM, PO
 
 def parse_player_100_poss(row):
 
-	if row[30].text_content() == " " or row[30].text_content() == "":
+	if row[31].text_content() == " " or row[31].text_content() == "":
 		defense_ranking = 0
 	else:
-		defense_ranking = int(row[30].text_content())
+		defense_ranking = int(row[31].text_content())
 
 	return {
         "name": str(row[1].text_content()),
         "position": POSITION_ABBREVIATIONS_TO_POSITION[row[2].text_content()],
         "age": int(row[3].text_content()),
         "team": TEAM_ABBREVIATIONS_TO_TEAM[row[4].text_content()],
+        "team_abbr":str(row[4].text_content()),
         "games_played": int(row[5].text_content()),
         "games_started": int(row[6].text_content()),
         "minutes_played": int(row[7].text_content()),
