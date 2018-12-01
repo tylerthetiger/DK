@@ -89,16 +89,6 @@ def GetEligiblePlayers(csvOfAllPlayers):
 
     return finalList
 
-#TODO: get eligible players, calculate defensive ranking, assign to team
-def getPlayerDefensiveRanking():
-    playerStats = client.players_stats_per_100_poss('2019')
-    test = []
-
-    for defensiveRating in playerStats:
-        test.append(defensiveRating['defensive_rating'])
-
-    return test
-
 def getBoxScoreForPlayerFromLists(playerName,BoxScoreList):
     for boxscore in BoxScoreList:
         #print boxscore['name']

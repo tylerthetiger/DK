@@ -1,11 +1,23 @@
 import csv
 import datetime
 import time
-from player import * 
+#from player import *
 from nba_api.stats.endpoints import commonplayerinfo, playerfantasyprofile, playergamelog, teamgamelog, leaguegamelog
 from nba_api.stats.static import players, teams
 from basketball_reference_web_scraper import client,data #needed for team abbrevation mapping
 
+
+# get data from web instead of csv
+def GetInjuriesv2():
+    injuries = client.injury_report()
+    injuredPlayers = []
+
+    for injuredPlayer in injuries:
+        injuredPlayers.append(injuredPlayer['player'])
+    
+    return injuredPlayers
+
+	
 # create a dicionary mapping city abbr to city name for defensive rankings
 teamMapping = dict()
 
