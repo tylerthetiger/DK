@@ -236,10 +236,25 @@ def getPlayerDefensiveRanking():
 				team_defense[teamCity] = (defensive_rating,defensive_rating,1)
 		else:
 			pass
-			
-	# TODO assign defensive rating to team object
 
-	return team_defense
+	# find avg of all teams
+	total_defense = 0
+	for k, v in team_defense.items():
+		ind_defense = v[0]
+		total_defense = total_defense + ind_defense
+
+	team_average_defense = total_defense/30
+	print(team_average_defense)
+
+	# find offset by comparing team defense to average
+	team_offset_defense = dict()
+	for k, v in team_defense.items():
+		# print(v[0])
+		team_offset = float(v[0])/team_average_defense
+		# print(team_offset)
+		team_offset_defense[k] = team_offset
+
+	return team_offset_defense
 
 def getNextGameDefensiveRating(csvFileName):
 	allTeams = getListOfTeams(csvFileName)
