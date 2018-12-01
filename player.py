@@ -285,15 +285,21 @@ def GetPlayerProjection(player,debugoutput=True):
             if debugoutput:
                 print 'decreasing player projection due to back2back'
             projectedPoints = projectedPoints - (0.10 * lastTwoWeekAverage)
+        print 'getting defensive ranking by player'
         teamCity = teamMapping[opponentTeam]
-        defenseRanking = getNextGameDefensiveRating('defensive_ranking.csv')
-        print defenseRanking
+        # get defensive ranking by player
+        defenseRanking = getPlayerDefensiveRanking()
+        # print defenseRanking
         defenseOffset = defenseRanking[teamCity]
+        # defenseRanking = getNextGameDefensiveRating('defensive_ranking.csv')
+        # print defenseRanking
+        # defenseOffset = defenseRanking[teamCity]
         if debugoutput:
             print 'adjusting player by ' + str(defenseOffset) + ' for defensive offset'
         projectedPoints = projectedPoints * defenseOffset
         
         player.projection = projectedPoints
+        
 # def GetInjuries (csvFileName):
 #     injuredPlayers = []
 #     lineCount = 0

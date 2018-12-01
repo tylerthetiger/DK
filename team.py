@@ -168,6 +168,7 @@ def getTeamHome(csvFileName):
 #TODO: get eligible players, calculate defensive ranking, assign to team
 # we could make this more efficient by only getting defensive ratings of teams that are playing...this returns all
 def getPlayerDefensiveRanking():
+	allTeams = getListOfTeams('defensive_ranking.csv')
 	playerStats = client.players_stats_per_100_poss('2019')
 	injuredPlayers = GetInjuriesv2()
 	eligiblePlayers = []
@@ -201,7 +202,7 @@ def getPlayerDefensiveRanking():
 			team_defense_all[team] = (new_team_def_rating_avg,defensiverating_total+player_defensive_rating,players+1)
 		else:
 			team = testdefensiveRating['team_abbr']
-			print 'creating new entry for ' + str(team)
+			# print 'creating new entry for ' + str(team)
 			defensive_rating = testdefensiveRating['defensive_rating']
 			team_defense_all[team] = (defensive_rating,defensive_rating,1)
 	# print team_defense_all
@@ -229,7 +230,7 @@ def getPlayerDefensiveRanking():
 				# if team doesnt exist in list, create it
 				team = defensiveRating['team_abbr']
 				teamCity = teamMapping[team]
-				print 'creating new entry for ' + str(team)
+				# print 'creating new entry for ' + str(team)
 				# set defensive rating for team based on first player identified
 				defensive_rating = defensiveRating['defensive_rating']
 				# create a tuple for the dictionary
@@ -244,7 +245,7 @@ def getPlayerDefensiveRanking():
 		total_defense = total_defense + ind_defense
 
 	team_average_defense = total_defense/30
-	print(team_average_defense)
+	# print(team_average_defense)
 
 	# find offset by comparing team defense to average
 	team_offset_defense = dict()
@@ -254,8 +255,15 @@ def getPlayerDefensiveRanking():
 		# print(team_offset)
 		team_offset_defense[k] = team_offset
 
+	for teamobj in allTeams:
+		for teamdefense in team_offset_defense:
+			if teamobj.name in teamdefense:
+				teamobj.nextGameDefensiveRating = team_offset_defense[teamdefense]
+
 	return team_offset_defense
 
+
+#deprecated in favor of get defensive ranking by player
 def getNextGameDefensiveRating(csvFileName):
 	allTeams = getListOfTeams(csvFileName)
 	homeTeam = getTeamHome('nov_schedule.csv')
@@ -285,8 +293,11 @@ def getNextGameDefensiveRating(csvFileName):
 	return teamOffset
 
 def main():
-	test = getPlayerDefensiveRanking()
-	print(test)
+	# test = getPlayerDefensiveRanking()
+	# print(test)
+	defenseRanking = getPlayerDefensiveRanking()
+	print defenseRanking
+	defenseOffset = defenseRanking[teamCity]
 	# print teamBacktoBack_bballreference('DEN')
 	# awayRank = getAverageAwayRanking('defensive_ranking.csv')
 	# print(awayRank)
