@@ -25,6 +25,15 @@ teamMapping = dict()
 #restructure all of this code to create a list of Team objects that hold all the information that Player() needs to make projections
 #include a reference in the player to the Team object/list entry for the opponent and the player's team.
 
+def getTeamPace():
+	pace = client.teams_misc_stats('2019')
+	teamsPace = []
+
+	for team in pace:
+		teamPace.append(team['pace'])
+
+	return teamsPace
+
 #get the 2019 schedule from basketball reference.  Only do this once!
 schedule_2019 = client.season_schedule(season_end_year=2019)
 yesterday=(datetime.datetime.now() - datetime.timedelta(1))
@@ -307,9 +316,11 @@ def getNextGameDefensiveRating(csvFileName):
 def main():
 	# test = getPlayerDefensiveRanking()
 	# print(test)
-	defenseRanking = getPlayerDefensiveRanking()
-	print defenseRanking
-	defenseOffset = defenseRanking[teamCity]
+	# defenseRanking = getPlayerDefensiveRanking()
+	# print defenseRanking
+	# defenseOffset = defenseRanking[teamCity]
+	team_pace = getTeamPace()
+	print(team_pace)
 	# print teamBacktoBack_bballreference('DEN')
 	# awayRank = getAverageAwayRanking('defensive_ranking.csv')
 	# print(awayRank)

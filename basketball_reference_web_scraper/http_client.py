@@ -7,7 +7,7 @@ from basketball_reference_web_scraper.parsers.players_season_totals import parse
 from basketball_reference_web_scraper.parsers.injury_report import parse_injury_report
 from basketball_reference_web_scraper.parsers.last_n_days import parse_last_n_days_playerlist
 from basketball_reference_web_scraper.parsers.player_season_gamelog import parse_player_season
-
+from basketball_reference_web_scraper.parsers.team_misc_stats_parser import *
 from basketball_reference_web_scraper.parsers.player_stats_per_100_poss import *
 
 BASE_URL = 'https://www.basketball-reference.com'
@@ -96,3 +96,19 @@ def player_stats_per_100_poss(season_end_year):
     response.raise_for_status()
 
     return parse_players_100_poss(response.content)
+
+def team_misc_stats(season_end_year):
+    url = '{BASE_URL}/leagues/NBA_{season_end_year}.html'.format(
+        BASE_URL=BASE_URL,
+        season_end_year=season_end_year,
+    )
+
+    print(url)
+    response = requests.get(url=url)
+    
+    response.raise_for_status()
+
+    return parse_teams_misc_stats(response.content)
+
+
+
