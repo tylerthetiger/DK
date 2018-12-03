@@ -8,11 +8,14 @@ def parse_team_misc_stats(row):
 	}
 
 def parse_teams_misc_stats(page):
+    page = page[page.find("<table class=\"sortable stats_table\" id=\"misc_stats\" data-cols-to-freeze=2><caption>Miscellaneous Stats Table</caption>"):]
+    page = page[0:page.find("</table>")+len("</table>")]
     tree = html.fromstring(page)
     # Basketball Reference includes individual rows for players that played for multiple teams in a season
     # These rows have a separate class ("italic_text partial_table") than the players that played for a single team
     # across a season.
     # no class on rows in this dataset
+
     rows = tree.xpath('//table[@id="misc_stats"]/tbody/tr ')
     print(rows)
     totals = []
