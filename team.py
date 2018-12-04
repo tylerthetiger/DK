@@ -27,12 +27,28 @@ teamMapping = dict()
 
 def getTeamPace():
 	pace = client.teams_misc_stats('2019')
-	teamsPace = []
+	teamsPace = dict()
+
+	allPace = 0
+	countTeams = 0
 
 	for team in pace:
-		teamPace.append(team['pace'])
+		teamName = team['team_name']
+		teamPace = team['pace']
+		allPace += teamPace
+		countTeams += 1
+		teamsPace[teamName] = teamPace
 
-	return teamsPace
+	avgPace = allPace/countTeams
+
+	team_pace_offset = dict()
+	for k in teamsPace:
+		v = teamsPace[k]
+		team_offset = (v)/avgPace
+		# print(team_offset)
+		team_pace_offset[k] = team_offset
+
+	return team_pace_offset
 
 #get the 2019 schedule from basketball reference.  Only do this once!
 schedule_2019 = client.season_schedule(season_end_year=2019)

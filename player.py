@@ -262,6 +262,7 @@ def GetProjection_bballreference(listOfPlayers,NumberOfGames=30,debugoutput=True
             #this will fill in the player.lastTwoWeekAverage 
             GetPlayerProjection(player,debugoutput=True)
            # print "found player!{}".format(player.name)
+
 def GetPlayerProjection(player,debugoutput=True):
         lastTwoWeekAverage = projectedPoints = player.lastTwoWeekAverage#baseline projected points
         opponentTeam = player.nextOpponent
@@ -287,23 +288,24 @@ def GetPlayerProjection(player,debugoutput=True):
         if debugoutput:
             print 'adjusting player by ' + str(defenseOffset) + ' for defensive offset'
         projectedPoints = projectedPoints * defenseOffset
-        
+
+        # offest for opponent team pace
+        print 'getting pace offset'
+        paceOffset = getTeamPace()
+        for team in teamCity:
+            for k in paceOffset:
+                v = paceOffset[k]
+                if team in k:
+                    teamPaceOffset = v
+                else:
+                    pass
+
+        if debugoutput:
+            print 'adjusting player by ' + str(teamPaceOffset) + ' for pace offset'
+   
+        projectedPoints = projectedPoints * teamPaceOffset
+
         player.projection = projectedPoints
-        
-# def GetInjuries (csvFileName):
-#     injuredPlayers = []
-#     lineCount = 0
-#     with open(csvFileName) as csv_file:
-#         csv_reader = csv.reader(csv_file, delimiter=',')
-#         for row in csv_reader:
-#             if lineCount == 0:
-#                 lineCount += 1
-#             else:
-#                 rawName = row[0]
-#                 findFullName = rawName.find("\\")
-#                 nameOnly = rawName[0:findFullName]
-#                 injuredPlayers.append(nameOnly)
-#     return injuredPlayers
 
 # def GetProjection(listOfPlayers,debugoutput=True,usenbaapi=False):
 #     for player in listOfPlayers:

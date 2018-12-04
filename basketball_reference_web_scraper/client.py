@@ -65,7 +65,6 @@ def players_stats_per_100_poss(season_end_year, output_type=None, output_file_pa
 
 def teams_misc_stats(season_end_year, output_type=None, output_file_path=None, output_write_option=None, json_options=None):
     values = http_client.team_misc_stats(season_end_year)
-    print(values)
     return output(
         values=values,
         output_type=output_type,
