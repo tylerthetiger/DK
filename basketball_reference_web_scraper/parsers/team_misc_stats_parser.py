@@ -3,11 +3,11 @@ from lxml import html
 from basketball_reference_web_scraper.data import TEAM_ABBREVIATIONS_TO_TEAM, POSITION_ABBREVIATIONS_TO_POSITION
 
 def parse_team_misc_stats(row):
-
-    if row[12].text_content() == " " or row[12].text_content() == "":
+  #  print row
+    if row[13].text_content() == " " or row[13].text_content() == "":
         pace = 0
     else:
-        pace = float(row[12].text_content())
+        pace = float(row[13].text_content())
 
 	return {
         "team_name": str(row[1].text_content()),
